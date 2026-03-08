@@ -1,44 +1,45 @@
 
 
-# Plan: Llenar secciones vacías + Fix warning de consola
+# Plan: Corregir datos de ejemplo — Semillero como medio de cobertura
 
-## Testing realizado
+## Problema
 
-La navegación, scroll suave, lightboxes de galería y reportajes, y todas las secciones con datos funcionan correctamente. No se detectaron errores de scroll ni de overflow.
+Los datos insertados tratan a Semillero de Campeones como un equipo que juega partidos. En realidad es un **medio deportivo** que cubre fútbol juvenil y de barrio.
 
-## Problema encontrado en consola
+## Cambios en datos
 
-`Function components cannot be given refs` — viene del ErrorBoundary. Se necesita revisar cómo se wrappea.
+### 1. Estadísticas — Métricas de cobertura
 
-## Secciones vacías a llenar con datos de ejemplo
+Eliminar los datos actuales (12 rows) y reemplazar con categorías de cobertura:
 
-No se pudo acceder al Facebook (bloquea scraping automático), pero basándome en el contexto existente del sitio (fútbol juvenil y de barrio en Argentina, Liga Al Toque, escuelas formativas), voy a insertar datos realistas.
+- **Cobertura 2026**: Partidos cubiertos: 48, Fotos publicadas: 1.200+, Videos: 35, Torneos: 6
+- **Comunidad**: Equipos cubiertos: 24, Jugadores destacados: 60, Seguidores: 3.500+, Reportajes: 18
+- **Alcance**: Canchas visitadas: 12, Categorías: 5, Barrios: 8, Horas de transmisión: 90+
 
-### 1. Estadísticas — Insertar datos de ejemplo
+### 2. Fechas — Partidos que van a cubrir
 
-Tabla `estadisticas`: campos `categoria`, `label`, `value`, `suffix`
+Actualizar las 5 fechas para que Semillero no aparezca como equipo, sino que los partidos sean entre otros equipos que ellos van a cubrir:
 
-Datos a insertar:
-- **Sub-12**: Equipos: 8, Jugadores: 120, Goles: 85, Partidos: 24
-- **Sub-15**: Equipos: 10, Jugadores: 150, Goles: 110, Partidos: 30
-- **Sub-17**: Equipos: 6, Jugadores: 90, Goles: 72, Partidos: 18
+- Club El Renacer vs Tercer Tiempo FC (Sub-12)
+- Los Halcones vs Academia Sur (Sub-15)
+- Deportivo San Martín vs Estrella del Barrio (Sub-17)
+- etc.
 
-### 2. Fechas — Insertar partidos de ejemplo
+### 3. Noticias — Perspectiva de medio
 
-Tabla `fechas`: campos `fecha`, `dia`, `hora`, `local`, `visitante`, `categoria`, `sede`, `en_vivo`
+Actualizar las 4 noticias para que sean desde la perspectiva de cobertura:
 
-Datos: 4-5 partidos con equipos que coincidan con el contexto (Club El Renacer, Tercer Tiempo, etc. que ya aparecen en reportajes).
+- "Arranca el Torneo Apertura 2026 — Estaremos cubriendo todos los partidos"
+- "Goleada en Sub-15: El Renacer 4 - Tercer Tiempo 1"
+- "Se abren inscripciones en 3 escuelitas de la zona — Toda la info acá"
+- "Diego Martínez convocado a la selección regional — Lo seguimos desde Sub-10"
 
-### 3. Noticias — Insertar noticias de ejemplo
+### 4. Componente Estadisticas.tsx — Ajustar iconos
 
-Tabla `noticias`: campos `titulo`, `tag`, `descripcion`, `fecha`, `imagen_url`, `categoria`, `tiempo_lectura`
-
-Datos: 3-4 noticias sobre torneos, resultados, inauguraciones, que reflejen el contenido típico de Semillero de Campeones.
+Actualizar el mapeo de iconos `catIcons` para que coincida con las nuevas categorías (Cobertura, Comunidad, Alcance) en vez de Sub-12/15/17.
 
 ## Ejecución
 
-Una sola migración SQL con todos los INSERTs para poblar las 3 tablas vacías.
-
-## Archivos a modificar
-- Migration SQL nueva (insertar datos de ejemplo en estadísticas, fechas y noticias)
+1. Migration SQL: DELETE + INSERT para las 3 tablas
+2. Editar `Estadisticas.tsx` para los nuevos nombres de categorías e iconos
 
