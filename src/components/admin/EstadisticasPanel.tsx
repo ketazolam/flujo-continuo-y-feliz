@@ -20,7 +20,7 @@ const EstadisticasPanel = () => {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="font-bebas text-2xl text-foreground">Gestión de Estadísticas</h2>
+        <h2 className="font-space font-bold uppercase text-2xl text-foreground">Gestión de Estadísticas</h2>
         <button onClick={save} className="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:bg-primary/90">
           Guardar cambios
         </button>
