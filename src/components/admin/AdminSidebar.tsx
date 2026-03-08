@@ -9,6 +9,7 @@ const menuItems = [
   { id: "fechas", label: "Fechas", icon: Calendar },
   { id: "noticias", label: "Noticias", icon: FileText },
   { id: "tienda", label: "Tienda", icon: Store },
+  { id: "reportajes", label: "Reportajes", icon: Mic },
   { id: "contacto", label: "Contacto", icon: Phone },
   { id: "pedidos", label: "Pedidos", icon: Package },
 ];

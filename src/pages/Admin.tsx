@@ -24,6 +24,7 @@ const panels: Record<string, React.FC<any>> = {
   estadisticas: EstadisticasPanel,
   fechas: FechasPanel,
   tienda: TiendaPanel,
+  reportajes: ReportajesPanel,
   contacto: ContactoPanel,
   pedidos: PedidosPanel,
 };
