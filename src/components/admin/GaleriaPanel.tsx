@@ -122,7 +122,16 @@ const GaleriaPanel = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {items.map((item) => (
             <div key={item.id} className="bg-card border border-border rounded-xl overflow-hidden group relative">
-              {item.imagen_url ? (
+              {item.imagen_url && isVideoFile(item.imagen_url) ? (
+                <div className="relative">
+                  <video src={item.imagen_url} preload="metadata" muted className="w-full aspect-square object-cover" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-primary/80 flex items-center justify-center">
+                      <Play size={18} className="text-primary-foreground ml-0.5" />
+                    </div>
+                  </div>
+                </div>
+              ) : item.imagen_url ? (
                 <div className="relative">
                   <img src={item.imagen_url} alt={item.titulo} className="w-full aspect-square object-cover" />
                   {item.tipo === "Video" && (
