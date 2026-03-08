@@ -94,11 +94,14 @@ const GaleriaPanel = () => {
 
           <label className="flex items-center gap-2 px-4 py-3 bg-secondary border border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
             <Upload size={16} className="text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">{imageFile ? imageFile.name : tipo === "Video" ? "Miniatura del video (opcional)" : "Seleccionar imagen"}</span>
-            <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} className="hidden" />
+            <span className="text-sm text-muted-foreground">{imageFile ? imageFile.name : tipo === "Video" ? "Archivo de video o miniatura (opcional)" : "Seleccionar imagen"}</span>
+            <input type="file" accept={tipo === "Video" ? "image/*,video/mp4,video/webm,video/quicktime" : "image/*"} onChange={(e) => setImageFile(e.target.files?.[0] || null)} className="hidden" />
           </label>
           {imageFile && imageFile.type.startsWith("image/") && (
             <img src={URL.createObjectURL(imageFile)} alt="Preview" className="w-full h-40 object-cover rounded-lg" />
+          )}
+          {imageFile && isVideoFileObj(imageFile) && (
+            <video src={URL.createObjectURL(imageFile)} controls className="w-full h-40 object-cover rounded-lg" />
           )}
           {tipo === "Video" && videoUrl && getYouTubeId(videoUrl) && (
             <div className="rounded-lg overflow-hidden">
