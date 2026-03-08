@@ -1,0 +1,56 @@
+import { useState } from "react";
+import AdminLogin from "@/components/admin/AdminLogin";
+import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminTopbar from "@/components/admin/AdminTopbar";
+import DashboardPanel from "@/components/admin/DashboardPanel";
+import NoticiasPanel from "@/components/admin/NoticiasPanel";
+import GaleriaPanel from "@/components/admin/GaleriaPanel";
+import EstadisticasPanel from "@/components/admin/EstadisticasPanel";
+import CronicasPanel from "@/components/admin/CronicasPanel";
+import ProductosPanel from "@/components/admin/ProductosPanel";
+import PedidosPanel from "@/components/admin/PedidosPanel";
+
+const panels: Record<string, React.FC> = {
+  dashboard: DashboardPanel,
+  noticias: NoticiasPanel,
+  galeria: GaleriaPanel,
+  estadisticas: EstadisticasPanel,
+  cronicas: CronicasPanel,
+  productos: ProductosPanel,
+  pedidos: PedidosPanel,
+};
+
+const Admin = () => {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [activePanel, setActivePanel] = useState("dashboard");
+  const [mobileMenu, setMobileMenu] = useState(false);
+
+  if (!loggedIn) return <AdminLogin onLogin={() => setLoggedIn(true)} />;
+
+  const ActivePanel = panels[activePanel] || DashboardPanel;
+
+  return (
+    <div className="min-h-screen bg-background flex">
+      <AdminSidebar activePanel={activePanel} onSelect={(p) => { setActivePanel(p); setMobileMenu(false); }} />
+
+      {/* Mobile sidebar overlay */}
+      {mobileMenu && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div className="absolute inset-0 bg-background/80" onClick={() => setMobileMenu(false)} />
+          <div className="relative w-64 min-h-screen bg-card border-r border-border p-4">
+            <AdminSidebar activePanel={activePanel} onSelect={(p) => { setActivePanel(p); setMobileMenu(false); }} />
+          </div>
+        </div>
+      )}
+
+      <div className="flex-1 flex flex-col">
+        <AdminTopbar activePanel={activePanel} onLogout={() => setLoggedIn(false)} onMobileMenu={() => setMobileMenu(!mobileMenu)} />
+        <main className="flex-1 overflow-auto">
+          <ActivePanel />
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default Admin;
