@@ -36,7 +36,7 @@ const Tienda = () => {
   if (plans.length === 0) return null;
 
   return (
-    <section id="tienda" className="py-28 px-4">
+    <section id="tienda" className="py-16 md:py-28 px-4">
       <div className="max-w-7xl mx-auto">
         <Pricing
           plans={plans}

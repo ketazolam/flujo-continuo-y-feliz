@@ -52,7 +52,7 @@ const Estadisticas = () => {
   }, {} as Record<string, typeof stats>);
 
   return (
-    <section id="estadisticas" className="py-16 md:py-28 px-4">
+    <section id="estadisticas" className="py-16 md:py-16 md:py-28 px-4">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -72,7 +72,7 @@ const Estadisticas = () => {
         ) : Object.keys(grouped).length === 0 ? (
           <p className="text-center text-muted-foreground py-16">No hay estadísticas disponibles</p>
         ) : (
-          <div className="grid md:grid-cols-3 gap-8">
+          <div classNagrid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:d-cols-3 gap-8">
             {Object.entries(grouped).map(([cat, items], i) => {
               const Icon = catIcons[cat] || Trophy;
               return (
