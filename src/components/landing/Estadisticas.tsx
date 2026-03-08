@@ -72,7 +72,7 @@ const Estadisticas = () => {
         ) : Object.keys(grouped).length === 0 ? (
           <p className="text-center text-muted-foreground py-16">No hay estadísticas disponibles</p>
         ) : (
-          <div classNagrid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:d-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
             {Object.entries(grouped).map(([cat, items], i) => {
               const Icon = catIcons[cat] || Trophy;
               return (
