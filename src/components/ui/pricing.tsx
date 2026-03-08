@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Star, ShoppingCart } from "lucide-react";
 import { useState, useRef } from "react";
-import confetti from "canvas-confetti";
+// confetti removed - was canvas-confetti
 import NumberFlow from "@number-flow/react";
 
 interface PricingPlan {
