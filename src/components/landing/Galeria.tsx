@@ -3,7 +3,9 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Image, Play, Loader2, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Image, Play, Loader2, ChevronLeft, ChevronRight, X, Video } from "lucide-react";
+
+const isVideoFile = (url: string) => /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url);
 
 const filters = ["Todo", "Fotos", "Videos"];
 
