@@ -7,6 +7,11 @@ import { Image, Play, Loader2, ChevronLeft, ChevronRight, X } from "lucide-react
 
 const filters = ["Todo", "Fotos", "Videos"];
 
+const getYouTubeId = (url: string) => {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([^?&\s]+)/);
+  return match?.[1] || null;
+};
+
 const Lightbox = ({
   items,
   index,
@@ -21,6 +26,7 @@ const Lightbox = ({
   onPrev: () => void;
 }) => {
   const item = items[index];
+  const videoId = item.tipo === "Video" && item.video_url ? getYouTubeId(item.video_url) : null;
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -45,35 +51,22 @@ const Lightbox = ({
         className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm"
         onClick={onClose}
       >
-        {/* Close */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-background/20 text-foreground hover:bg-background/40 transition-colors"
-        >
+        <button onClick={onClose} className="absolute top-4 right-4 z-10 p-2 rounded-full bg-background/20 text-foreground hover:bg-background/40 transition-colors">
           <X size={24} />
         </button>
 
-        {/* Prev */}
         {index > 0 && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onPrev(); }}
-            className="absolute left-2 md:left-6 z-10 p-3 rounded-full bg-background/20 text-foreground hover:bg-background/40 transition-colors"
-          >
+          <button onClick={(e) => { e.stopPropagation(); onPrev(); }} className="absolute left-2 md:left-6 z-10 p-3 rounded-full bg-background/20 text-foreground hover:bg-background/40 transition-colors">
             <ChevronLeft size={28} />
           </button>
         )}
 
-        {/* Next */}
         {index < items.length - 1 && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onNext(); }}
-            className="absolute right-2 md:right-6 z-10 p-3 rounded-full bg-background/20 text-foreground hover:bg-background/40 transition-colors"
-          >
+          <button onClick={(e) => { e.stopPropagation(); onNext(); }} className="absolute right-2 md:right-6 z-10 p-3 rounded-full bg-background/20 text-foreground hover:bg-background/40 transition-colors">
             <ChevronRight size={28} />
           </button>
         )}
 
-        {/* Content */}
         <motion.div
           key={index}
           initial={{ opacity: 0, scale: 0.9 }}
@@ -82,12 +75,18 @@ const Lightbox = ({
           className="flex flex-col items-center px-12 md:px-20"
           onClick={(e) => e.stopPropagation()}
         >
-          {item.imagen_url ? (
-            <img
-              src={item.imagen_url}
-              alt={item.titulo}
-              className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg"
-            />
+          {videoId ? (
+            <div className="w-[90vw] max-w-4xl aspect-video">
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
+                title={item.titulo}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full rounded-lg"
+              />
+            </div>
+          ) : item.imagen_url ? (
+            <img src={item.imagen_url} alt={item.titulo} className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg" />
           ) : (
             <div className="w-64 h-64 bg-card flex items-center justify-center rounded-lg">
               <Image size={48} className="text-muted-foreground" />
@@ -102,7 +101,6 @@ const Lightbox = ({
           </div>
         </motion.div>
 
-        {/* Counter */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-muted-foreground">
           {index + 1} / {items.length}
         </div>
@@ -177,46 +175,53 @@ const Galeria = () => {
           <p className="text-center text-muted-foreground py-16">No hay contenido en la galería aún</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {filtered.map((item, i) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
-                whileHover={{ scale: 1.03 }}
-                className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer"
-                onClick={() => setSelectedIndex(i)}
-              >
-                {item.imagen_url ? (
-                  <img src={item.imagen_url} alt={item.titulo} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-card border border-border flex items-center justify-center">
-                    <Image size={32} className="text-muted-foreground" />
+            {filtered.map((item, i) => {
+              const videoId = item.tipo === "Video" && (item as any).video_url ? getYouTubeId((item as any).video_url) : null;
+              const thumbnail = item.imagen_url || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null);
+
+              return (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.08 }}
+                  whileHover={{ scale: 1.03 }}
+                  className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer"
+                  onClick={() => setSelectedIndex(i)}
+                >
+                  {thumbnail ? (
+                    <>
+                      <img src={thumbnail} alt={item.titulo} className="w-full h-full object-cover" />
+                      {item.tipo === "Video" && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="w-14 h-14 rounded-full bg-primary/80 flex items-center justify-center shadow-lg">
+                            <Play size={24} className="text-primary-foreground ml-1" />
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="w-full h-full bg-card border border-border flex items-center justify-center">
+                      <Image size={32} className="text-muted-foreground" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                    <span className="text-foreground text-sm font-medium">{item.titulo}</span>
+                    <span className="text-xs text-primary flex items-center gap-1">
+                      {item.tipo === "Video" && <Play size={10} />}
+                      {item.tipo}
+                    </span>
                   </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                  <span className="text-foreground text-sm font-medium">{item.titulo}</span>
-                  <span className="text-xs text-primary flex items-center gap-1">
-                    {item.tipo === "Video" && <Play size={10} />}
-                    {item.tipo}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* Lightbox */}
       {selectedIndex !== null && (
-        <Lightbox
-          items={filtered}
-          index={selectedIndex}
-          onClose={onClose}
-          onNext={goNext}
-          onPrev={goPrev}
-        />
+        <Lightbox items={filtered} index={selectedIndex} onClose={onClose} onNext={goNext} onPrev={goPrev} />
       )}
     </section>
   );

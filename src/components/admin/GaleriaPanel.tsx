@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadImage } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Upload, Loader2, Image } from "lucide-react";
+import { Plus, Trash2, Upload, Loader2, Image, Play } from "lucide-react";
 
 const GaleriaPanel = () => {
   const queryClient = useQueryClient();
@@ -12,6 +12,7 @@ const GaleriaPanel = () => {
   const [titulo, setTitulo] = useState("");
   const [tipo, setTipo] = useState("Foto");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [videoUrl, setVideoUrl] = useState("");
   const [uploading, setUploading] = useState(false);
 
   const { data: items = [], isLoading } = useQuery({
@@ -30,12 +31,16 @@ const GaleriaPanel = () => {
       if (imageFile) {
         imagen_url = await uploadImage(imageFile, "galeria");
       }
-      const { error } = await supabase.from("galeria").insert({ titulo, tipo, imagen_url });
+      const insertData: any = { titulo, tipo, imagen_url };
+      if (tipo === "Video" && videoUrl.trim()) {
+        insertData.video_url = videoUrl.trim();
+      }
+      const { error } = await supabase.from("galeria").insert(insertData);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["galeria"] });
-      setTitulo(""); setImageFile(null);
+      setTitulo(""); setImageFile(null); setVideoUrl("");
       setShowForm(false); setUploading(false);
       toast({ title: "Elemento agregado a galería" });
     },
@@ -53,6 +58,11 @@ const GaleriaPanel = () => {
     },
   });
 
+  const getYouTubeId = (url: string) => {
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([^?&\s]+)/);
+    return match?.[1] || null;
+  };
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
@@ -69,13 +79,29 @@ const GaleriaPanel = () => {
             <option value="Foto">Foto</option>
             <option value="Video">Video</option>
           </select>
+
+          {tipo === "Video" && (
+            <input
+              placeholder="URL de YouTube (ej: https://youtube.com/watch?v=...)"
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+            />
+          )}
+
           <label className="flex items-center gap-2 px-4 py-3 bg-secondary border border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
             <Upload size={16} className="text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">{imageFile ? imageFile.name : "Seleccionar imagen o video"}</span>
-            <input type="file" accept="image/*,video/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} className="hidden" />
+            <span className="text-sm text-muted-foreground">{imageFile ? imageFile.name : tipo === "Video" ? "Miniatura del video (opcional)" : "Seleccionar imagen"}</span>
+            <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} className="hidden" />
           </label>
           {imageFile && imageFile.type.startsWith("image/") && (
             <img src={URL.createObjectURL(imageFile)} alt="Preview" className="w-full h-40 object-cover rounded-lg" />
+          )}
+          {tipo === "Video" && videoUrl && getYouTubeId(videoUrl) && (
+            <div className="rounded-lg overflow-hidden">
+              <img src={`https://img.youtube.com/vi/${getYouTubeId(videoUrl)}/hqdefault.jpg`} alt="YouTube thumbnail" className="w-full h-40 object-cover rounded-lg" />
+              <p className="text-xs text-muted-foreground mt-1">Vista previa del video de YouTube</p>
+            </div>
           )}
           <button type="submit" disabled={uploading} className="px-6 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:bg-primary/90 flex items-center gap-2 disabled:opacity-50">
             {uploading && <Loader2 size={14} className="animate-spin" />}
@@ -91,7 +117,25 @@ const GaleriaPanel = () => {
           {items.map((item) => (
             <div key={item.id} className="bg-card border border-border rounded-xl overflow-hidden group relative">
               {item.imagen_url ? (
-                <img src={item.imagen_url} alt={item.titulo} className="w-full aspect-square object-cover" />
+                <div className="relative">
+                  <img src={item.imagen_url} alt={item.titulo} className="w-full aspect-square object-cover" />
+                  {item.tipo === "Video" && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-primary/80 flex items-center justify-center">
+                        <Play size={18} className="text-primary-foreground ml-0.5" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : item.tipo === "Video" && (item as any).video_url && getYouTubeId((item as any).video_url) ? (
+                <div className="relative">
+                  <img src={`https://img.youtube.com/vi/${getYouTubeId((item as any).video_url)}/hqdefault.jpg`} alt={item.titulo} className="w-full aspect-square object-cover" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-primary/80 flex items-center justify-center">
+                      <Play size={18} className="text-primary-foreground ml-0.5" />
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <div className="w-full aspect-square bg-secondary flex items-center justify-center">
                   <Image size={32} className="text-muted-foreground" />
