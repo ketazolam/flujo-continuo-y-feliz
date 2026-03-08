@@ -29,7 +29,7 @@ const Contacto = () => {
   const cobertura = config?.cobertura ?? "Fútbol Juvenil y de Barrio · Colombia";
 
   return (
-    <section id="contacto" className="py-28 px-4 bg-secondary/30">
+    <section id="contacto" className="py-16 md:py-28 px-4 bg-secondary/30">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
