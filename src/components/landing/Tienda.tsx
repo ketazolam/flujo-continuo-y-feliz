@@ -27,7 +27,7 @@ const Tienda = () => {
 
   if (isLoading) {
     return (
-      <section id="tienda" className="py-28 px-4">
+      <section id="tienda" className="py-16 md:py-28 px-4">
         <div className="flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       </section>
     );
