@@ -14,6 +14,7 @@ import TiendaPanel from "@/components/admin/TiendaPanel";
 import ContactoPanel from "@/components/admin/ContactoPanel";
 import ReportajesPanel from "@/components/admin/ReportajesPanel";
 import PedidosPanel from "@/components/admin/PedidosPanel";
+import PublicidadPanel from "@/components/admin/PublicidadPanel";
 import { Loader2 } from "lucide-react";
 
 const Admin = () => {
@@ -41,6 +42,7 @@ const Admin = () => {
       case "fechas": return <FechasPanel />;
       case "tienda": return <TiendaPanel />;
       case "reportajes": return <ReportajesPanel />;
+      case "publicidad": return <PublicidadPanel />;
       case "contacto": return <ContactoPanel />;
       case "pedidos": return <PedidosPanel />;
       default: return <DashboardPanel onNavigate={(p) => setActivePanel(p)} />;
