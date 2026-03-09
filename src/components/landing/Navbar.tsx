@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import logo from "@/assets/logo.jpg";
 
 const navLinks = [
   { label: "Quiénes Somos", href: "#quienes-somos" },
@@ -33,10 +34,7 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
         <a href="#" onClick={(e) => scrollToSection(e, "#")} className="flex items-center">
-          {/* Logo placeholder - upload logo image later */}
-          <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <span className="text-primary font-bold text-sm">LOGO</span>
-          </div>
+          <img src={logo} alt="Semillero de Campeones" className="h-10 w-auto object-contain rounded" />
         </a>
 
         <div className="hidden md:flex items-center gap-6">
