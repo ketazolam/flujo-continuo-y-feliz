@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Users, Trophy, Camera, Heart, Target, MapPin } from "lucide-react";
+import { Users, Trophy, Camera } from "lucide-react";
 
 const valores = [
   {

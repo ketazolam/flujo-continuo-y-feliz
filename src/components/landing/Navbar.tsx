@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, Trophy } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 const navLinks = [
   { label: "Quiénes Somos", href: "#quienes-somos" },
