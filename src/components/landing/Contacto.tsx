@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 
 const Contacto = () => {
   const { toast } = useToast();
-  const [form, setForm] = useState({ nombre: "", whatsapp: "", asunto: "", mensaje: "" });
+  const [form, setForm] = useState({ nombre: "", asunto: "", mensaje: "" });
 
   const { data: config, isLoading } = useQuery({
     queryKey: ["contacto_config"],
