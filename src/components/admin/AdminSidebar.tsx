@@ -2,8 +2,6 @@ import { BarChart3, FileText, Image, ShoppingBag, Package, LayoutDashboard, Cale
 
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "hero", label: "Hero", icon: Sparkles },
-  { id: "quienes-somos", label: "Quiénes Somos", icon: Users },
   { id: "galeria", label: "Galería", icon: Image },
   { id: "estadisticas", label: "Estadísticas", icon: BarChart3 },
   { id: "fechas", label: "Fechas", icon: Calendar },
