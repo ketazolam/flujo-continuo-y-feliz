@@ -4,8 +4,6 @@ import AdminLogin from "@/components/admin/AdminLogin";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminTopbar from "@/components/admin/AdminTopbar";
 import DashboardPanel from "@/components/admin/DashboardPanel";
-import HeroPanel from "@/components/admin/HeroPanel";
-import QuienesSomosPanel from "@/components/admin/QuienesSomosPanel";
 import NoticiasPanel from "@/components/admin/NoticiasPanel";
 import GaleriaPanel from "@/components/admin/GaleriaPanel";
 import EstadisticasPanel from "@/components/admin/EstadisticasPanel";
@@ -34,8 +32,6 @@ const Admin = () => {
 
   const renderPanel = () => {
     switch (activePanel) {
-      case "hero": return <HeroPanel />;
-      case "quienes-somos": return <QuienesSomosPanel />;
       case "noticias": return <NoticiasPanel />;
       case "galeria": return <GaleriaPanel />;
       case "estadisticas": return <EstadisticasPanel />;
