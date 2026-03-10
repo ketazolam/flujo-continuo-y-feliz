@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import { Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -72,6 +73,10 @@ function HeroGeometric({
   ctaText?: string;
   ctaHref?: string;
 }) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+
   const fadeUpVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({
@@ -86,12 +91,30 @@ function HeroGeometric({
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-16">
+    <section ref={sectionRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-16">
+      {/* Hero background image with parallax + Ken Burns zoom */}
+      <motion.div
+        className="absolute inset-0 z-0"
+        style={{ y: bgY }}
+      >
+        <motion.img
+          src="/hero-bg.jpg"
+          alt=""
+          aria-hidden="true"
+          className="w-full h-full object-cover object-center scale-110"
+          initial={{ scale: 1.15 }}
+          animate={{ scale: 1.05 }}
+          transition={{ duration: 8, ease: "easeOut" }}
+        />
+        {/* Dark overlay so text stays readable */}
+        <div className="absolute inset-0 bg-background/70" />
+      </motion.div>
+
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.05] via-transparent to-accent/[0.05]" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-br from-primary/[0.05] via-transparent to-accent/[0.05]" />
 
       {/* Geometric shapes — varied float speeds */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 z-[2] overflow-hidden">
         <ElegantShape
           delay={0.2}
           width={600}
@@ -140,7 +163,7 @@ function HeroGeometric({
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4">
+      <div className="relative z-10 container mx-auto px-4 drop-shadow-lg">
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
           <motion.div
@@ -224,23 +247,6 @@ function HeroGeometric({
 
       {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
-
-      {/* Scroll indicator — mouse icon with animated wheel */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
-      >
-        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground/60">Deslizar</span>
-        <div className="w-6 h-10 border-2 border-muted-foreground/40 rounded-full flex justify-center pt-1.5">
-          <motion.div
-            animate={{ y: [0, 14, 0], opacity: [1, 0.3, 1] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-            className="w-1 h-2 bg-primary rounded-full"
-          />
-        </div>
-      </motion.div>
     </section>
   );
 }

@@ -17,9 +17,7 @@ const SafeImage = ({ src, alt, className }: { src: string; alt: string; classNam
   return <img src={src} alt={alt} className={className} onError={() => setError(true)} />;
 };
 
-const ImageLightbox = ({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) => {
-  const [imgError, setImgError] = useState(false);
-
+const NoticiaModal = ({ noticia, onClose }: { noticia: any; onClose: () => void }) => {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", handler);
@@ -27,34 +25,66 @@ const ImageLightbox = ({ src, alt, onClose }: { src: string; alt: string; onClos
     return () => { window.removeEventListener("keydown", handler); document.body.style.overflow = ""; };
   }, [onClose]);
 
+  const dateStr = noticia.fecha
+    ? new Date(noticia.fecha).toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" })
+    : null;
+
   return createPortal(
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"
         onClick={onClose}
       >
-        <button onClick={onClose} className="absolute top-4 right-4 z-10 p-2 rounded-full bg-background/20 text-foreground hover:bg-background/40 transition-colors">
-          <X size={24} />
-        </button>
-        {imgError ? (
-          <div className="bg-card rounded-lg p-12 flex flex-col items-center gap-3" onClick={(e) => e.stopPropagation()}>
-            <Image size={48} className="text-muted-foreground" />
-            <p className="text-muted-foreground text-sm">No se pudo cargar la imagen</p>
+        <motion.div
+          initial={{ opacity: 0, y: 40, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="relative bg-card rounded-2xl overflow-hidden w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-background/60 text-foreground hover:bg-background/90 transition-colors"
+          >
+            <X size={20} />
+          </button>
+
+          {noticia.imagen_url && (
+            <div className="w-full h-56 sm:h-72">
+              <SafeImage src={noticia.imagen_url} alt={noticia.titulo} className="w-full h-full object-cover" />
+              <div className="absolute top-0 left-0 right-0 h-56 sm:h-72 bg-gradient-to-b from-transparent to-card/80 pointer-events-none" />
+            </div>
+          )}
+
+          <div className="p-6 md:p-8">
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {noticia.tag && (
+                <span className="text-xs font-semibold text-primary-foreground bg-primary px-3 py-1 rounded-full tracking-wider">
+                  {noticia.tag}
+                </span>
+              )}
+              {noticia.categoria && (
+                <span className="text-xs font-medium bg-accent/20 text-accent px-3 py-1 rounded-full">
+                  {noticia.categoria}
+                </span>
+              )}
+              {dateStr && <span className="text-xs text-muted-foreground ml-auto">{dateStr}</span>}
+            </div>
+
+            <h2 className="font-space font-bold text-2xl md:text-3xl text-foreground mb-4 leading-tight">
+              {noticia.titulo}
+            </h2>
+
+            {noticia.descripcion && (
+              <p className="text-foreground/80 text-base leading-relaxed whitespace-pre-line">
+                {noticia.descripcion}
+              </p>
+            )}
           </div>
-        ) : (
-          <motion.img
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            src={src}
-            alt={alt}
-            className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
-            onClick={(e) => e.stopPropagation()}
-            onError={() => setImgError(true)}
-          />
-        )}
+        </motion.div>
       </motion.div>
     </AnimatePresence>,
     document.body
@@ -62,7 +92,7 @@ const ImageLightbox = ({ src, alt, onClose }: { src: string; alt: string; onClos
 };
 
 const Noticias = () => {
-  const [lightboxImg, setLightboxImg] = useState<{ src: string; alt: string } | null>(null);
+  const [selectedNoticia, setSelectedNoticia] = useState<any | null>(null);
 
   const { data: noticias = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["noticias"],
@@ -78,11 +108,7 @@ const Noticias = () => {
     try { return formatDistanceToNow(new Date(date), { addSuffix: true, locale: es }); } catch { return ""; }
   };
 
-  const openImage = (url: string, title: string) => {
-    setLightboxImg({ src: url, alt: title });
-  };
-
-  const closeLightbox = useCallback(() => setLightboxImg(null), []);
+  const closeModal = useCallback(() => setSelectedNoticia(null), []);
 
   return (
     <section id="noticias" className="py-16 md:py-28 px-4">
@@ -125,7 +151,7 @@ const Noticias = () => {
               transition={{ duration: 0.7, delay: 0.1 }}
               whileHover={{ y: -4 }}
               className="relative rounded-2xl mb-8 hover:shadow-lg hover:shadow-primary/10 transition-all cursor-pointer group overflow-hidden"
-              onClick={() => noticias[0].imagen_url && openImage(noticias[0].imagen_url, noticias[0].titulo)}
+              onClick={() => setSelectedNoticia(noticias[0])}
             >
               {noticias[0].imagen_url ? (
                 <div className="relative h-48 sm:h-64 md:h-80">
@@ -169,7 +195,7 @@ const Noticias = () => {
                     transition={{ duration: 0.5, delay: 0.15 + i * 0.1 }}
                     whileHover={{ y: -4, scale: 1.02 }}
                     className="bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all cursor-pointer group"
-                    onClick={() => n.imagen_url && openImage(n.imagen_url, n.titulo)}
+                    onClick={() => setSelectedNoticia(n)}
                   >
                     {n.imagen_url && (
                       <SafeImage src={n.imagen_url} alt={n.titulo} className="w-full h-36 object-cover" />
@@ -188,7 +214,7 @@ const Noticias = () => {
         )}
       </div>
 
-      {lightboxImg && <ImageLightbox src={lightboxImg.src} alt={lightboxImg.alt} onClose={closeLightbox} />}
+      {selectedNoticia && <NoticiaModal noticia={selectedNoticia} onClose={closeModal} />}
     </section>
   );
 };
