@@ -11,12 +11,25 @@ import { Plus, Trash2, Edit2, X, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { uploadImage } from "@/lib/storage";
 
-type Posicion = "carrusel" | "banner_fijo" | "entre_noticias";
+type Posicion =
+  | "carrusel"
+  | "banner_fijo"
+  | "entre_noticias"
+  | "ficha-jugador"
+  | "articulo-inicio"
+  | "articulo-final"
+  | "estadisticas-entre-tablas"
+  | "video-bajo-reproductor";
 
 const POSICION_LABELS: Record<Posicion, string> = {
   carrusel: "Carrusel de sponsors",
   banner_fijo: "Banner fijo inferior",
-  entre_noticias: "Entre noticias",
+  entre_noticias: "Entre noticias (grid)",
+  "ficha-jugador": "Ficha jugador — debajo de la foto",
+  "articulo-inicio": "Artículo — entre párrafo 2 y 3",
+  "articulo-final": "Artículo — al final del contenido",
+  "estadisticas-entre-tablas": "Estadísticas — entre tablas",
+  "video-bajo-reproductor": "Video — debajo del reproductor",
 };
 
 interface Publicidad {

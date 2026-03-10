@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Newspaper, X, AlertCircle, Image, Megaphone } from "lucide-react";
+import AdBanner from "@/components/landing/AdBanner";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -78,11 +79,21 @@ const NoticiaModal = ({ noticia, onClose }: { noticia: any; onClose: () => void 
               {noticia.titulo}
             </h2>
 
-            {noticia.descripcion && (
-              <p className="text-foreground/80 text-base leading-relaxed whitespace-pre-line">
-                {noticia.descripcion}
-              </p>
-            )}
+            {noticia.descripcion && (() => {
+              const parrafos = noticia.descripcion.split(/\n\n+/).filter(Boolean);
+              return (
+                <div className="space-y-4 text-foreground/80 text-base leading-relaxed">
+                  {parrafos.map((p: string, i: number) => (
+                    <>
+                      <p key={i} className="whitespace-pre-line">{p}</p>
+                      {i === 1 && <AdBanner key="ad-inicio" posicion="articulo-inicio" className="my-4" />}
+                    </>
+                  ))}
+                </div>
+              );
+            })()}
+
+            <AdBanner posicion="articulo-final" className="mt-6" />
           </div>
         </motion.div>
       </motion.div>

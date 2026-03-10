@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Camera, Users, Radio } from "lucide-react";
+import AdBanner from "@/components/landing/AdBanner";
 
 const catIcons: Record<string, typeof Camera> = {
   "Cobertura 2026": Camera,
@@ -71,9 +72,10 @@ const Estadisticas = () => {
           <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
         ) : Object.keys(grouped).length === 0 ? (
           <p className="text-center text-muted-foreground py-16">No hay estadísticas disponibles</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-            {Object.entries(grouped).map(([cat, items], i) => {
+        ) : (() => {
+            const entries = Object.entries(grouped);
+            const split = Math.ceil(entries.length / 2);
+            const renderCard = ([cat, items]: [string, typeof stats], i: number) => {
               const Icon = catIcons[cat] || Camera;
               return (
                 <motion.div
@@ -101,9 +103,22 @@ const Estadisticas = () => {
                   </div>
                 </motion.div>
               );
-            })}
-          </div>
-        )}
+            };
+            return (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+                  {entries.slice(0, split).map((entry, i) => renderCard(entry, i))}
+                </div>
+                {entries.length > 1 && <AdBanner posicion="estadisticas-entre-tablas" />}
+                {entries.length > split && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+                    {entries.slice(split).map((entry, i) => renderCard(entry, split + i))}
+                  </div>
+                )}
+              </>
+            );
+          })()
+        }
       </div>
     </section>
   );

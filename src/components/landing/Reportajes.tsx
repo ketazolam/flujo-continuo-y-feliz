@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Mic, X, Play, AlertCircle, Image } from "lucide-react";
+import AdBanner from "@/components/landing/AdBanner";
 
 const isVideoFile = (url: string) => /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url);
 
@@ -54,6 +55,7 @@ const ReportajeLightbox = ({ item, onClose }: { item: any; onClose: () => void }
             <SafeImage src={item.imagen_url} alt={item.titulo} className="w-full max-h-[50vh] object-cover" />
           ) : null}
           <div className="p-6 md:p-8">
+            <AdBanner posicion="video-bajo-reproductor" className="mt-0 mb-6" />
             <div className="flex items-center gap-2 mb-3">
               <span className="inline-block text-xs font-semibold text-primary-foreground bg-primary px-3 py-1 rounded-full tracking-wider">{item.tag}</span>
               {dateStr && <span className="text-xs text-muted-foreground">{dateStr}</span>}
@@ -61,6 +63,7 @@ const ReportajeLightbox = ({ item, onClose }: { item: any; onClose: () => void }
             <h3 className="font-space font-bold text-xl md:text-2xl text-foreground mb-1">{item.titulo}</h3>
             {item.subtitulo && <p className="text-muted-foreground text-sm mb-4">{item.subtitulo}</p>}
             <p className="text-foreground/80 text-sm leading-relaxed whitespace-pre-line">{item.contenido}</p>
+            <AdBanner posicion="articulo-final" className="mt-6 mb-0" />
           </div>
         </motion.div>
       </motion.div>
