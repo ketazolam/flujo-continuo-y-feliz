@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Camera, Users, Radio } from "lucide-react";
-import AdBanner from "@/components/landing/AdBanner";
 
 const catIcons: Record<string, typeof Camera> = {
   "Cobertura 2026": Camera,
@@ -124,14 +123,11 @@ const Estadisticas = () => {
             </div>
 
             {secondHalf.length > 0 && (
-              <>
-                <AdBanner posicion="estadisticas-entre-tablas" />
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-                  {secondHalf.map(([cat, items], i) => (
-                    <StatCard key={cat} cat={cat} items={items} delay={i * 0.1} />
-                  ))}
-                </div>
-              </>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 mt-6">
+                {secondHalf.map(([cat, items], i) => (
+                  <StatCard key={cat} cat={cat} items={items} delay={i * 0.1} />
+                ))}
+              </div>
             )}
           </>
         )}

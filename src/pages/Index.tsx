@@ -10,7 +10,6 @@ import Tienda from "@/components/landing/Tienda";
 import Contacto from "@/components/landing/Contacto";
 import Footer from "@/components/landing/Footer";
 import Publicidad from "@/components/landing/Publicidad";
-import BannerFijo from "@/components/landing/BannerFijo";
 import PopupAd from "@/components/landing/PopupAd";
 
 const Index = () => (
@@ -27,7 +26,6 @@ const Index = () => (
     <Tienda />
     <Contacto />
     <Footer />
-    <BannerFijo />
     <PopupAd />
   </div>
 );
