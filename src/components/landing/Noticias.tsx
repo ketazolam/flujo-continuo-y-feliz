@@ -15,7 +15,7 @@ const SafeImage = ({ src, alt, className }: { src: string; alt: string; classNam
       <Image size={32} className="text-muted-foreground" />
     </div>
   );
-  return <img src={src} alt={alt} className={className} onError={() => setError(true)} />;
+  return <img src={src} alt={alt} className={className} loading="lazy" decoding="async" onError={() => setError(true)} />;
 };
 
 const NoticiaModal = ({ noticia, onClose }: { noticia: any; onClose: () => void }) => {

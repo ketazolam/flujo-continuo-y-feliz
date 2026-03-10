@@ -21,7 +21,7 @@ const formatDate = (d: string | null) => {
 const SafeImage = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
   const [error, setError] = useState(false);
   if (error) return <div className={`bg-secondary flex items-center justify-center ${className}`}><Image size={32} className="text-muted-foreground" /></div>;
-  return <img src={src} alt={alt} className={className} onError={() => setError(true)} />;
+  return <img src={src} alt={alt} className={className} loading="lazy" decoding="async" onError={() => setError(true)} />;
 };
 
 const SafeVideo = ({ src, className, controls, autoPlay, muted, preload }: { src: string; className?: string; controls?: boolean; autoPlay?: boolean; muted?: boolean; preload?: string }) => {

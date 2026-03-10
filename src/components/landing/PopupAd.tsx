@@ -5,8 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ExternalLink } from "lucide-react";
 
-const DELAY_MS = 5000;
-
 const PopupAd = () => {
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -29,8 +27,7 @@ const PopupAd = () => {
 
   useEffect(() => {
     if (!anuncio) return;
-    const timer = setTimeout(() => setVisible(true), DELAY_MS);
-    return () => clearTimeout(timer);
+    setVisible(true);
   }, [anuncio]);
 
   if (!anuncio || dismissed) return null;
@@ -43,16 +40,16 @@ const PopupAd = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          transition={{ duration: 0.25 }}
+          className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"
           onClick={() => setDismissed(true)}
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.88, y: 24 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.88, y: 24 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-            className="relative bg-card rounded-2xl overflow-hidden w-full max-w-md shadow-2xl border border-border/50"
+            initial={{ opacity: 0, y: 40, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 40, scale: 0.96 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="relative bg-card rounded-t-2xl sm:rounded-2xl overflow-hidden w-full sm:max-w-xl shadow-2xl border border-border/50"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -67,30 +64,34 @@ const PopupAd = () => {
             </span>
 
             {anuncio.imagen_url && (
-              <div className="w-full bg-muted">
+              <div className="w-full bg-card">
                 <img
                   src={anuncio.imagen_url}
                   alt={anuncio.titulo}
-                  className="w-full object-contain max-h-72"
+                  className="w-full object-contain max-h-64 sm:max-h-80"
                   loading="eager"
                   decoding="async"
                 />
               </div>
             )}
 
-            <div className="p-5 pt-4">
-              <p className="font-semibold text-foreground text-base mb-1">{anuncio.titulo}</p>
-              {anuncio.enlace_url && (
-                <a
-                  href={anuncio.enlace_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-primary/90 active:scale-95 transition-all"
-                >
-                  Visitar sitio <ExternalLink size={14} />
-                </a>
-              )}
-            </div>
+            {(anuncio.titulo || anuncio.enlace_url) && (
+              <div className="px-5 py-4">
+                {anuncio.titulo && (
+                  <p className="font-semibold text-foreground text-base mb-1">{anuncio.titulo}</p>
+                )}
+                {anuncio.enlace_url && (
+                  <a
+                    href={anuncio.enlace_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-primary/90 active:scale-95 transition-all"
+                  >
+                    Visitar sitio <ExternalLink size={14} />
+                  </a>
+                )}
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}

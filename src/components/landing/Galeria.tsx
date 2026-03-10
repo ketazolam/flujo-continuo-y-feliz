@@ -24,7 +24,7 @@ const MediaFallback = ({ size = 48 }: { size?: number }) => (
 const SafeImage = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
   const [error, setError] = useState(false);
   if (error) return <MediaFallback />;
-  return <img src={src} alt={alt} className={className} onError={() => setError(true)} />;
+  return <img src={src} alt={alt} className={className} loading="lazy" decoding="async" onError={() => setError(true)} />;
 };
 
 const SafeVideo = ({ src, className, controls, autoPlay, muted, preload }: { src: string; className?: string; controls?: boolean; autoPlay?: boolean; muted?: boolean; preload?: string }) => {
@@ -221,7 +221,7 @@ const Galeria = () => {
                       initial={{ opacity: 0, scale: 0.95 }}
                       whileInView={{ opacity: 1, scale: 1 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.4, delay: i * 0.08 }}
+                      transition={{ duration: 0.35, delay: Math.min(i * 0.06, 0.3) }}
                       whileHover={{ scale: 1.03 }}
                       className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer"
                       onClick={() => setSelectedIndex(i)}
