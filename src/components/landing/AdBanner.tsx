@@ -26,8 +26,8 @@ const AdBanner = ({ posicion, className = "" }: AdBannerProps) => {
   if (!anuncio) return null;
 
   return (
-    <div className={`my-6 flex flex-col items-center ${className}`}>
-      <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-widest mb-1.5 self-start sm:self-center">
+    <div className={`flex flex-col items-center my-5 ${className}`}>
+      <span className="text-[10px] font-medium text-muted-foreground/50 uppercase tracking-widest mb-1.5 self-start sm:self-center">
         Sponsor
       </span>
       <a
@@ -35,8 +35,8 @@ const AdBanner = ({ posicion, className = "" }: AdBannerProps) => {
         target={anuncio.enlace_url ? "_blank" : undefined}
         rel="noopener noreferrer"
         className="block rounded-lg overflow-hidden border border-border bg-primary/5 hover:border-primary/30 transition-colors
-          w-[320px] h-[50px]
-          sm:w-[728px] sm:h-[90px]"
+          w-full max-w-[320px] h-[50px]
+          sm:max-w-[728px] sm:h-[90px]"
       >
         {anuncio.imagen_url ? (
           <img

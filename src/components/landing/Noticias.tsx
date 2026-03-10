@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Fragment } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -84,10 +84,10 @@ const NoticiaModal = ({ noticia, onClose }: { noticia: any; onClose: () => void 
               return (
                 <div className="space-y-4 text-foreground/80 text-base leading-relaxed">
                   {parrafos.map((p: string, i: number) => (
-                    <>
-                      <p key={i} className="whitespace-pre-line">{p}</p>
-                      {i === 1 && <AdBanner key="ad-inicio" posicion="articulo-inicio" className="my-4" />}
-                    </>
+                    <Fragment key={i}>
+                      <p className="whitespace-pre-line">{p}</p>
+                      {i === 1 && <AdBanner posicion="articulo-inicio" className="my-2" />}
+                    </Fragment>
                   ))}
                 </div>
               );
@@ -244,9 +244,8 @@ const Noticias = () => {
             {noticias.length > 1 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 {noticias.slice(1).map((n, i) => (
-                  <>
+                  <Fragment key={n.id}>
                     <motion.article
-                      key={n.id}
                       initial={{ opacity: 0, y: 30 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
@@ -265,11 +264,10 @@ const Noticias = () => {
                         <span className="text-xs text-muted-foreground">{timeAgo(n.fecha)}</span>
                       </div>
                     </motion.article>
-                    {/* Ad after second news item (index 1 in slice = 3rd total) */}
                     {i === 1 && adsEntreNoticias[0] && (
-                      <AdEntreNoticias key={`ad-${adsEntreNoticias[0].id}`} anuncio={adsEntreNoticias[0]} />
+                      <AdEntreNoticias anuncio={adsEntreNoticias[0]} />
                     )}
-                  </>
+                  </Fragment>
                 ))}
               </div>
             )}
