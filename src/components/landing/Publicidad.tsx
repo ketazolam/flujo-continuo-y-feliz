@@ -12,6 +12,7 @@ const Publicidad = () => {
         .from("publicidad")
         .select("*")
         .eq("activo", true)
+        .eq("posicion", "carrusel")
         .order("orden", { ascending: true });
       if (error) throw error;
       return data;

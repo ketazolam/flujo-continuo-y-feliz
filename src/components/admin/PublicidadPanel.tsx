@@ -6,9 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, Edit2, X, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { uploadImage } from "@/lib/storage";
+
+type Posicion = "carrusel" | "banner_fijo" | "entre_noticias";
+
+const POSICION_LABELS: Record<Posicion, string> = {
+  carrusel: "Carrusel de sponsors",
+  banner_fijo: "Banner fijo inferior",
+  entre_noticias: "Entre noticias",
+};
 
 interface Publicidad {
   id: string;
@@ -17,6 +26,7 @@ interface Publicidad {
   enlace_url: string | null;
   activo: boolean;
   orden: number;
+  posicion: Posicion;
 }
 
 const PublicidadPanel = () => {
@@ -50,12 +60,15 @@ const PublicidadPanel = () => {
         enlace_url: data.enlace_url,
         activo: data.activo ?? true,
         orden: data.orden ?? 0,
+        posicion: data.posicion ?? "carrusel",
       });
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_publicidad"] });
       queryClient.invalidateQueries({ queryKey: ["publicidad"] });
+      queryClient.invalidateQueries({ queryKey: ["publicidad_banner_fijo"] });
+      queryClient.invalidateQueries({ queryKey: ["publicidad_entre_noticias"] });
       toast.success("Anuncio creado");
       setCreating(false);
       setForm({});
@@ -79,6 +92,8 @@ const PublicidadPanel = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_publicidad"] });
       queryClient.invalidateQueries({ queryKey: ["publicidad"] });
+      queryClient.invalidateQueries({ queryKey: ["publicidad_banner_fijo"] });
+      queryClient.invalidateQueries({ queryKey: ["publicidad_entre_noticias"] });
       toast.success("Anuncio actualizado");
       setEditingId(null);
       setForm({});
@@ -95,6 +110,8 @@ const PublicidadPanel = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_publicidad"] });
       queryClient.invalidateQueries({ queryKey: ["publicidad"] });
+      queryClient.invalidateQueries({ queryKey: ["publicidad_banner_fijo"] });
+      queryClient.invalidateQueries({ queryKey: ["publicidad_entre_noticias"] });
       toast.success("Anuncio eliminado");
     },
     onError: () => toast.error("Error al eliminar"),
@@ -146,6 +163,22 @@ const PublicidadPanel = () => {
                 onChange={(e) => setForm({ ...form, titulo: e.target.value })}
                 placeholder="Nombre del anuncio"
               />
+            </div>
+            <div>
+              <Label>Posición</Label>
+              <Select
+                value={form.posicion ?? "carrusel"}
+                onValueChange={(value) => setForm({ ...form, posicion: value as Posicion })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar posición" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(POSICION_LABELS).map(([val, label]) => (
+                    <SelectItem key={val} value={val}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label>Imagen</Label>
@@ -205,6 +238,22 @@ const PublicidadPanel = () => {
                     />
                   </div>
                   <div>
+                    <Label>Posición</Label>
+                    <Select
+                      value={form.posicion ?? "carrusel"}
+                      onValueChange={(value) => setForm({ ...form, posicion: value as Posicion })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar posición" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(POSICION_LABELS).map(([val, label]) => (
+                          <SelectItem key={val} value={val}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
                     <Label>Imagen</Label>
                     {form.imagen_url && (
                       <img src={form.imagen_url} alt="" className="w-32 h-20 object-cover rounded mb-2" />
@@ -262,6 +311,9 @@ const PublicidadPanel = () => {
                     <p className="text-xs text-muted-foreground">
                       {anuncio.activo ? "✓ Activo" : "Inactivo"} · Orden: {anuncio.orden}
                     </p>
+                    <span className="inline-block text-[10px] font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full mt-1">
+                      {POSICION_LABELS[anuncio.posicion as Posicion] ?? anuncio.posicion}
+                    </span>
                   </div>
                   <div className="flex gap-2">
                     <Button variant="ghost" size="icon" onClick={() => handleEdit(anuncio)}>

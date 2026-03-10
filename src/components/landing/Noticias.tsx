@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Newspaper, X, AlertCircle, Image } from "lucide-react";
+import { Loader2, Newspaper, X, AlertCircle, Image, Megaphone } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -91,6 +91,38 @@ const NoticiaModal = ({ noticia, onClose }: { noticia: any; onClose: () => void 
   );
 };
 
+const AdEntreNoticias = ({ anuncio }: { anuncio: any }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.4 }}
+    className="col-span-1 sm:col-span-2 lg:col-span-4"
+  >
+    <a
+      href={anuncio.enlace_url || "#"}
+      target={anuncio.enlace_url ? "_blank" : undefined}
+      rel="noopener noreferrer"
+      className="block relative rounded-xl overflow-hidden group border border-border hover:border-primary/40 transition-colors"
+    >
+      {anuncio.imagen_url ? (
+        <img
+          src={anuncio.imagen_url}
+          alt={anuncio.titulo}
+          className="w-full h-24 sm:h-28 object-cover group-hover:scale-[1.02] transition-transform duration-300"
+        />
+      ) : (
+        <div className="w-full h-24 sm:h-28 bg-card flex items-center justify-center">
+          <span className="text-foreground font-medium">{anuncio.titulo}</span>
+        </div>
+      )}
+      <span className="absolute top-2 left-2 flex items-center gap-1 text-[10px] text-muted-foreground bg-background/70 px-2 py-0.5 rounded-full">
+        <Megaphone size={10} /> Publicidad
+      </span>
+    </a>
+  </motion.div>
+);
+
 const Noticias = () => {
   const [selectedNoticia, setSelectedNoticia] = useState<any | null>(null);
 
@@ -102,6 +134,20 @@ const Noticias = () => {
       return data;
     },
     retry: 2,
+  });
+
+  const { data: adsEntreNoticias = [] } = useQuery({
+    queryKey: ["publicidad_entre_noticias"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("publicidad")
+        .select("*")
+        .eq("activo", true)
+        .eq("posicion", "entre_noticias")
+        .order("orden", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
   });
 
   const timeAgo = (date: string) => {
@@ -187,26 +233,32 @@ const Noticias = () => {
             {noticias.length > 1 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 {noticias.slice(1).map((n, i) => (
-                  <motion.article
-                    key={n.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.15 + i * 0.1 }}
-                    whileHover={{ y: -4, scale: 1.02 }}
-                    className="bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all cursor-pointer group"
-                    onClick={() => setSelectedNoticia(n)}
-                  >
-                    {n.imagen_url && (
-                      <SafeImage src={n.imagen_url} alt={n.titulo} className="w-full h-36 object-cover" />
+                  <>
+                    <motion.article
+                      key={n.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.15 + i * 0.1 }}
+                      whileHover={{ y: -4, scale: 1.02 }}
+                      className="bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all cursor-pointer group"
+                      onClick={() => setSelectedNoticia(n)}
+                    >
+                      {n.imagen_url && (
+                        <SafeImage src={n.imagen_url} alt={n.titulo} className="w-full h-36 object-cover" />
+                      )}
+                      <div className="p-4 md:p-6">
+                        <span className="inline-block text-[10px] font-semibold text-primary-foreground bg-primary/80 px-2.5 py-0.5 rounded-full tracking-wider mb-3">{n.tag}</span>
+                        <h3 className="font-space font-semibold text-base mb-2 text-foreground group-hover:text-primary transition-colors leading-snug">{n.titulo}</h3>
+                        {n.descripcion && <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{n.descripcion}</p>}
+                        <span className="text-xs text-muted-foreground">{timeAgo(n.fecha)}</span>
+                      </div>
+                    </motion.article>
+                    {/* Ad after second news item (index 1 in slice = 3rd total) */}
+                    {i === 1 && adsEntreNoticias[0] && (
+                      <AdEntreNoticias key={`ad-${adsEntreNoticias[0].id}`} anuncio={adsEntreNoticias[0]} />
                     )}
-                    <div className="p-4 md:p-6">
-                      <span className="inline-block text-[10px] font-semibold text-primary-foreground bg-primary/80 px-2.5 py-0.5 rounded-full tracking-wider mb-3">{n.tag}</span>
-                      <h3 className="font-space font-semibold text-base mb-2 text-foreground group-hover:text-primary transition-colors leading-snug">{n.titulo}</h3>
-                      {n.descripcion && <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{n.descripcion}</p>}
-                      <span className="text-xs text-muted-foreground">{timeAgo(n.fecha)}</span>
-                    </div>
-                  </motion.article>
+                  </>
                 ))}
               </div>
             )}
