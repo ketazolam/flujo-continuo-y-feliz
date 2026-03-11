@@ -38,23 +38,27 @@ const Publicidad = () => {
             {anuncios.map((anuncio) => (
               <div
                 key={anuncio.id}
-                className="w-full max-w-sm sm:max-w-none sm:flex-1 sm:min-w-[260px] sm:max-w-[480px]"
+                className="w-full max-w-sm sm:flex-1 sm:min-w-[260px] sm:max-w-[480px]"
               >
-                <button
+                {/* padding-bottom hack: crea aspect ratio 16:9 confiable en todos los browsers */}
+                <div
                   onClick={() => setSelectedAd(anuncio)}
-                  className="relative group flex items-center justify-center w-full aspect-video rounded-xl overflow-hidden border border-border bg-muted hover:border-primary/40 transition-colors cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === "Enter" && setSelectedAd(anuncio)}
                   aria-label={`Ver anuncio: ${anuncio.titulo}`}
+                  className="relative w-full pb-[56.25%] rounded-xl overflow-hidden border border-border bg-muted hover:border-primary/40 transition-colors cursor-pointer group"
                 >
                   {anuncio.imagen_url ? (
                     <img
                       src={anuncio.imagen_url}
                       alt={anuncio.titulo}
-                      className="w-full h-full object-contain"
+                      className="absolute inset-0 w-full h-full object-contain"
                       loading="lazy"
                       decoding="async"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center px-4">
+                    <div className="absolute inset-0 flex items-center justify-center px-4">
                       <span className="text-muted-foreground text-sm font-medium text-center">
                         {anuncio.titulo}
                       </span>
@@ -65,7 +69,7 @@ const Publicidad = () => {
                       Ver más <ChevronRight size={11} />
                     </span>
                   </div>
-                </button>
+                </div>
               </div>
             ))}
           </div>
