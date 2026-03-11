@@ -75,9 +75,9 @@ const PopupAd = () => {
               </div>
             )}
 
-            {(anuncio.titulo || anuncio.enlace_url) && (
+            {(anuncio.enlace_url) && (
               <div className="px-5 py-4">
-                {anuncio.titulo && (
+                {anuncio.titulo && anuncio.titulo !== "Nuevo anuncio" && anuncio.titulo !== "Publicidad" && (
                   <p className="font-semibold text-foreground text-base mb-1">{anuncio.titulo}</p>
                 )}
                 {anuncio.enlace_url && (

@@ -48,7 +48,9 @@ const AdDetailModal = ({ anuncio, onClose }: AdDetailModalProps) => createPortal
         )}
 
         <div className="p-5">
-          <p className="font-semibold text-foreground text-base mb-4">{anuncio.titulo}</p>
+          {anuncio.titulo && anuncio.titulo !== "Nuevo anuncio" && anuncio.titulo !== "Publicidad" && (
+            <p className="font-semibold text-foreground text-base mb-4">{anuncio.titulo}</p>
+          )}
           {anuncio.enlace_url && (
             <a
               href={anuncio.enlace_url}

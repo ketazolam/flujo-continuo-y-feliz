@@ -189,7 +189,7 @@ const PublicidadPanel = () => {
         imagen_url = await uploadImage(payload.imageFile, "publicidad");
       }
       const { error } = await supabase.from("publicidad").insert({
-        titulo: payload.titulo?.trim() || "Nuevo anuncio",
+        titulo: payload.titulo?.trim() || "Publicidad",
         imagen_url,
         enlace_url: payload.enlace_url?.trim() || null,
         activo: payload.activo ?? true,
