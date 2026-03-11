@@ -41,7 +41,7 @@ const PopupAd = () => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"
+          className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
           onClick={() => setDismissed(true)}
         >
           <motion.div
@@ -49,7 +49,7 @@ const PopupAd = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.96 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="relative bg-card rounded-t-2xl sm:rounded-2xl overflow-hidden w-full sm:max-w-xl shadow-2xl border border-border/50"
+            className="relative bg-card rounded-2xl overflow-hidden w-full max-w-sm sm:max-w-lg shadow-2xl border border-border/50"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -64,11 +64,11 @@ const PopupAd = () => {
             </span>
 
             {anuncio.imagen_url && (
-              <div className="w-full bg-card">
+              <div className="w-full bg-muted flex items-center justify-center">
                 <img
                   src={anuncio.imagen_url}
                   alt={anuncio.titulo}
-                  className="w-full object-contain max-h-64 sm:max-h-80"
+                  className="w-full object-contain max-h-[55vh]"
                   loading="eager"
                   decoding="async"
                 />
