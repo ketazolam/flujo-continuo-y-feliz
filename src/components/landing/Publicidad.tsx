@@ -34,12 +34,11 @@ const Publicidad = () => {
             </p>
           </div>
 
-          {/* flex-wrap + justify-center: centra 1, 2 o 3 anuncios en cualquier pantalla */}
-          <div className="flex flex-wrap justify-center gap-4 md:gap-5">
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center sm:items-stretch md:gap-5">
             {anuncios.map((anuncio) => (
               <div
                 key={anuncio.id}
-                className="w-full min-w-0 sm:flex-1 sm:min-w-[260px] sm:max-w-[480px]"
+                className="w-full max-w-sm sm:max-w-none sm:flex-1 sm:min-w-[260px] sm:max-w-[480px]"
               >
                 <button
                   onClick={() => setSelectedAd(anuncio)}
