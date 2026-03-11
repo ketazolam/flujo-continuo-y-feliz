@@ -64,7 +64,7 @@ const PopupAd = () => {
             </span>
 
             {anuncio.imagen_url && (
-              <div style={{ background: "#ffffff", width: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <img
                   src={anuncio.imagen_url}
                   alt={anuncio.titulo}

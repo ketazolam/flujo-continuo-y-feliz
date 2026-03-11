@@ -47,7 +47,7 @@ const Publicidad = () => {
                   onKeyDown={(e) => e.key === "Enter" && setSelectedAd(anuncio)}
                   aria-label={`Ver anuncio: ${anuncio.titulo}`}
                   className="w-full rounded-xl overflow-hidden border border-border hover:border-primary/40 transition-colors cursor-pointer group"
-                  style={{ position: "relative", aspectRatio: "16/9", background: "#ffffff" }}
+                  style={{ position: "relative", aspectRatio: "16/9" }}
                 >
                   {anuncio.imagen_url ? (
                     <img
