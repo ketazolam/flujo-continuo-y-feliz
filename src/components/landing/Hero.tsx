@@ -14,10 +14,10 @@ const Hero = () => {
 
   return (
     <HeroGeometric
-      badge={hero?.badge ?? "PORTAL DEPORTIVO · FÚTBOL JUVENIL"}
+      badge={hero?.badge ?? "PORTAL DEPORTIVO · FÚTBOL DE BARRIO"}
       title1={hero?.title1 ?? "SEMILLERO"}
       title2={hero?.title2 ?? "DE CAMPEONES"}
-      description={hero?.description ?? "Cobertura deportiva del fútbol juvenil y de barrio. Noticias, crónicas, estadísticas y más."}
+      description={hero?.description ?? "Cobertura deportiva del fútbol juvenil e infantil de los barrios. Noticias, historias, estadísticas y más."}
       ctaText={hero?.cta_text ?? "Explorar contenido"}
       ctaHref={hero?.cta_href ?? "#noticias"}
     />

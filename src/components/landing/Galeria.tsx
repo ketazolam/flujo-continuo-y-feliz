@@ -4,7 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Image, Play, Loader2, ChevronLeft, ChevronRight, X, Video, AlertCircle } from "lucide-react";
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
+
+const INITIAL_COUNT = 12;
+const LOAD_MORE_COUNT = 12;
 
 const isVideoFile = (url: string) => /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url);
 
@@ -139,6 +141,11 @@ const Lightbox = ({
 const Galeria = () => {
   const [filter, setFilter] = useState("Todo");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
+
+  useEffect(() => {
+    setVisibleCount(INITIAL_COUNT);
+  }, [filter]);
 
   const { data: items = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["galeria"],
@@ -151,6 +158,8 @@ const Galeria = () => {
   });
 
   const filtered = filter === "Todo" ? items : items.filter((i) => i.tipo === (filter === "Fotos" ? "Foto" : "Video"));
+  const visibleItems = filtered.slice(0, visibleCount);
+  const hasMore = filtered.length > visibleCount;
 
   const goNext = useCallback(() => {
     setSelectedIndex((prev) => (prev !== null && prev < filtered.length - 1 ? prev + 1 : prev));
@@ -170,7 +179,7 @@ const Galeria = () => {
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="flex items-center justify-between mb-8"
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
         >
           <div>
             <p className="text-primary text-sm font-semibold mb-1 tracking-wider uppercase">Galería</p>
@@ -178,23 +187,23 @@ const Galeria = () => {
               MOMENTOS CAPTURADOS
             </h2>
           </div>
-        </motion.div>
 
-        <div className="flex gap-3 mb-8">
-          {filters.map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filter === f
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card border border-border text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
+          <div className="flex gap-2">
+            {filters.map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                  filter === f
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card border border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+        </motion.div>
 
         {isLoading ? (
           <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
@@ -207,75 +216,86 @@ const Galeria = () => {
         ) : filtered.length === 0 ? (
           <p className="text-center text-muted-foreground py-16">No hay contenido en la galería aún</p>
         ) : (
-          <Carousel opts={{ align: "start", loop: true }} className="w-full">
-            <CarouselContent className="-ml-4">
-              {filtered.map((item, i) => {
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+              {visibleItems.map((item, i) => {
                 const videoId = item.tipo === "Video" && (item as any).video_url ? getYouTubeId((item as any).video_url) : null;
                 const isDirectVideo = item.imagen_url && isVideoFile(item.imagen_url);
                 const thumbnail = !isDirectVideo ? (item.imagen_url || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null)) : null;
                 const dateStr = formatDate((item as any).fecha_publicacion);
 
                 return (
-                  <CarouselItem key={item.id} className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.35, delay: Math.min(i * 0.06, 0.3) }}
-                      whileHover={{ scale: 1.03 }}
-                      className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer"
-                      onClick={() => setSelectedIndex(i)}
-                    >
-                      {isDirectVideo ? (
-                        <>
-                          <video
-                            src={item.imagen_url}
-                            className="w-full h-full object-cover"
-                            preload="metadata"
-                            muted
-                            playsInline
-                            onLoadedMetadata={(e) => { (e.target as HTMLVideoElement).currentTime = 0.1; }}
-                          />
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.3, delay: Math.min(i * 0.04, 0.25) }}
+                    whileHover={{ scale: 1.02 }}
+                    className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer"
+                    onClick={() => setSelectedIndex(i)}
+                  >
+                    {isDirectVideo ? (
+                      <>
+                        <video
+                          src={item.imagen_url}
+                          className="w-full h-full object-cover"
+                          preload="metadata"
+                          muted
+                          playsInline
+                          onLoadedMetadata={(e) => { (e.target as HTMLVideoElement).currentTime = 0.1; }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center shadow-lg">
+                            <Play size={20} className="text-primary-foreground ml-1" />
+                          </div>
+                        </div>
+                      </>
+                    ) : thumbnail ? (
+                      <>
+                        <SafeImage src={thumbnail} alt={item.titulo} className="w-full h-full object-cover" />
+                        {item.tipo === "Video" && (
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div className="w-14 h-14 rounded-full bg-primary/80 flex items-center justify-center shadow-lg">
-                              <Play size={24} className="text-primary-foreground ml-1" />
+                            <div className="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center shadow-lg">
+                              <Play size={20} className="text-primary-foreground ml-1" />
                             </div>
                           </div>
-                        </>
-                      ) : thumbnail ? (
-                        <>
-                          <SafeImage src={thumbnail} alt={item.titulo} className="w-full h-full object-cover" />
-                          {item.tipo === "Video" && (
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                              <div className="w-14 h-14 rounded-full bg-primary/80 flex items-center justify-center shadow-lg">
-                                <Play size={24} className="text-primary-foreground ml-1" />
-                              </div>
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <div className="w-full h-full bg-card border border-border flex items-center justify-center">
-                          <Video size={32} className="text-muted-foreground" />
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                        <span className="text-foreground text-sm font-medium">{item.titulo}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-primary flex items-center gap-1">
-                            {item.tipo === "Video" && <Play size={10} />}
-                            {item.tipo}
-                          </span>
-                          {dateStr && <span className="text-xs text-muted-foreground">· {dateStr}</span>}
-                        </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="w-full h-full bg-card border border-border flex items-center justify-center">
+                        <Video size={28} className="text-muted-foreground" />
                       </div>
-                    </motion.div>
-                  </CarouselItem>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                      <span className="text-foreground text-xs sm:text-sm font-medium line-clamp-1">{item.titulo}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs text-primary flex items-center gap-1">
+                          {item.tipo === "Video" && <Play size={9} />}
+                          {item.tipo}
+                        </span>
+                        {dateStr && <span className="text-xs text-muted-foreground">· {dateStr}</span>}
+                      </div>
+                    </div>
+                  </motion.div>
                 );
               })}
-            </CarouselContent>
-            <CarouselPrevious className="h-10 w-10 bg-primary/80 hover:bg-primary text-primary-foreground border-none left-2 transition-all duration-200" />
-            <CarouselNext className="h-10 w-10 bg-primary/80 hover:bg-primary text-primary-foreground border-none right-2 transition-all duration-200" />
-          </Carousel>
+            </div>
+
+            {hasMore && (
+              <div className="flex flex-col items-center mt-10 gap-2">
+                <button
+                  onClick={() => setVisibleCount((c) => c + LOAD_MORE_COUNT)}
+                  className="px-7 py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-semibold text-sm"
+                >
+                  Cargar más
+                </button>
+                <span className="text-xs text-muted-foreground">
+                  Mostrando {visibleItems.length} de {filtered.length}
+                </span>
+              </div>
+            )}
+          </>
         )}
       </div>
 
