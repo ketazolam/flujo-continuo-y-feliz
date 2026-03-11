@@ -25,44 +25,49 @@ const Publicidad = () => {
 
   return (
     <>
-      <section className="py-8 md:py-12 px-4">
+      <section className="py-8 md:py-12 px-5 md:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-center justify-center gap-2 mb-6">
             <Megaphone size={16} className="text-primary" />
             <p className="text-primary text-sm font-semibold tracking-wider uppercase">
               Sponsors
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+          {/* flex-wrap + justify-center: centra 1, 2 o 3 anuncios en cualquier pantalla */}
+          <div className="flex flex-wrap justify-center gap-4 md:gap-5">
             {anuncios.map((anuncio) => (
-              <button
+              <div
                 key={anuncio.id}
-                onClick={() => setSelectedAd(anuncio)}
-                className="relative group flex items-center justify-center w-full aspect-video rounded-xl overflow-hidden border border-border bg-muted hover:border-primary/40 transition-colors cursor-pointer"
-                aria-label={`Ver anuncio: ${anuncio.titulo}`}
+                className="w-full min-w-0 sm:flex-1 sm:min-w-[260px] sm:max-w-[480px]"
               >
-                {anuncio.imagen_url ? (
-                  <img
-                    src={anuncio.imagen_url}
-                    alt={anuncio.titulo}
-                    className="w-full h-full object-contain"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center px-4">
-                    <span className="text-muted-foreground text-sm font-medium text-center">
-                      {anuncio.titulo}
+                <button
+                  onClick={() => setSelectedAd(anuncio)}
+                  className="relative group flex items-center justify-center w-full aspect-video rounded-xl overflow-hidden border border-border bg-muted hover:border-primary/40 transition-colors cursor-pointer"
+                  aria-label={`Ver anuncio: ${anuncio.titulo}`}
+                >
+                  {anuncio.imagen_url ? (
+                    <img
+                      src={anuncio.imagen_url}
+                      alt={anuncio.titulo}
+                      className="w-full h-full object-contain"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center px-4">
+                      <span className="text-muted-foreground text-sm font-medium text-center">
+                        {anuncio.titulo}
+                      </span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors flex items-end justify-end p-3">
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-white text-xs font-semibold bg-black/50 px-2.5 py-1 rounded-full backdrop-blur-sm">
+                      Ver más <ChevronRight size={11} />
                     </span>
                   </div>
-                )}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors flex items-end justify-end p-3">
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-white text-xs font-semibold bg-black/50 px-2.5 py-1 rounded-full backdrop-blur-sm">
-                    Ver más <ChevronRight size={11} />
-                  </span>
-                </div>
-              </button>
+                </button>
+              </div>
             ))}
           </div>
         </div>

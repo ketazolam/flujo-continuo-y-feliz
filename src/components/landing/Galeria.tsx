@@ -5,8 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Image, Play, Loader2, ChevronLeft, ChevronRight, X, Video, AlertCircle } from "lucide-react";
 
-const INITIAL_COUNT = 12;
-const LOAD_MORE_COUNT = 12;
+const INITIAL_COUNT = 8;
+const LOAD_MORE_COUNT = 8;
 
 const isVideoFile = (url: string) => /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url);
 
