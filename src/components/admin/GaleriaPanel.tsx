@@ -533,8 +533,8 @@ const AlbumContentView = ({ album, onBack }: { album: any; onBack: () => void })
       {!isLoading && items.length === 0 && !uploading && (
         <label className="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl py-16 cursor-pointer hover:border-primary transition-colors mb-4">
           <Upload size={32} className="text-muted-foreground mb-3" />
-          <p className="text-sm font-medium text-foreground">Subí fotos o videos del álbum</p>
-          <p className="text-xs text-muted-foreground mt-1">Podés seleccionar varios a la vez</p>
+          <p className="text-sm font-medium text-foreground">Subí contenido al álbum (fotos y videos)</p>
+          <p className="text-xs text-muted-foreground mt-1">Los archivos se publicarán automáticamente en la galería</p>
           <input type="file" accept="image/*,video/*" multiple onChange={(e) => e.target.files && uploadFotos(e.target.files)} className="hidden" />
         </label>
       )}
