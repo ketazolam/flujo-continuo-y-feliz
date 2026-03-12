@@ -45,7 +45,7 @@ const QuienesSomos = () => (
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, delay: 0.1 }}
-        className="relative bg-card border border-border rounded-2xl p-8 md:p-12 mb-12 overflow-hidden"
+        className="relative bg-card border border-border rounded-2xl p-6 md:p-12 mb-8 md:mb-12 overflow-hidden"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.05] to-transparent" />
         <div className="relative z-10 text-center max-w-3xl mx-auto">

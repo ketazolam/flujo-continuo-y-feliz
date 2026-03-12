@@ -131,12 +131,9 @@ const Publicidad = () => {
             </p>
           </div>
 
-          <div className="flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center sm:items-stretch md:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
             {anuncios.map((anuncio) => (
-              <div
-                key={anuncio.id}
-                className="w-full max-w-sm sm:flex-1 sm:min-w-[260px] sm:max-w-[480px]"
-              >
+              <div key={anuncio.id}>
                 <AdCard anuncio={anuncio} onClick={() => setSelectedAd(anuncio)} />
               </div>
             ))}
