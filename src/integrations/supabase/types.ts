@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      albumes: {
+        Row: {
+          created_at: string
+          descripcion: string | null
+          fecha_publicacion: string | null
+          id: string
+          jornada: string | null
+          miniatura_url: string | null
+          titulo: string
+        }
+        Insert: {
+          created_at?: string
+          descripcion?: string | null
+          fecha_publicacion?: string | null
+          id?: string
+          jornada?: string | null
+          miniatura_url?: string | null
+          titulo: string
+        }
+        Update: {
+          created_at?: string
+          descripcion?: string | null
+          fecha_publicacion?: string | null
+          id?: string
+          jornada?: string | null
+          miniatura_url?: string | null
+          titulo?: string
+        }
+        Relationships: []
+      }
       contacto_config: {
         Row: {
           cobertura: string
@@ -104,39 +134,8 @@ export type Database = {
         }
         Relationships: []
       }
-      albumes: {
-        Row: {
-          created_at: string
-          descripcion: string | null
-          fecha_publicacion: string | null
-          id: string
-          jornada: string | null
-          miniatura_url: string | null
-          titulo: string
-        }
-        Insert: {
-          created_at?: string
-          descripcion?: string | null
-          fecha_publicacion?: string | null
-          id?: string
-          jornada?: string | null
-          miniatura_url?: string | null
-          titulo: string
-        }
-        Update: {
-          created_at?: string
-          descripcion?: string | null
-          fecha_publicacion?: string | null
-          id?: string
-          jornada?: string | null
-          miniatura_url?: string | null
-          titulo?: string
-        }
-        Relationships: []
-      }
       galeria: {
         Row: {
-          album_id: string | null
           created_at: string
           fecha_publicacion: string | null
           id: string
@@ -146,7 +145,6 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
-          album_id?: string | null
           created_at?: string
           fecha_publicacion?: string | null
           id?: string
@@ -156,7 +154,6 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
-          album_id?: string | null
           created_at?: string
           fecha_publicacion?: string | null
           id?: string
