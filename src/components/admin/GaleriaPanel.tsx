@@ -474,7 +474,7 @@ const AlbumContentView = ({ album, onBack }: { album: any; onBack: () => void })
         </div>
         <label className={`flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg cursor-pointer hover:bg-primary/90 shrink-0 ${uploading ? "opacity-60 pointer-events-none" : ""}`}>
           {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-          {uploading ? `Subiendo ${uploadProgress?.done}/${uploadProgress?.total}...` : "Subir archivos"}
+          {uploading ? `Subiendo ${uploadProgress?.done}/${uploadProgress?.total}...` : "Subir contenido"}
           <input
             type="file"
             accept="image/*,video/*"
