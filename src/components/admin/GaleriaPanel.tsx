@@ -474,7 +474,7 @@ const AlbumContentView = ({ album, onBack }: { album: any; onBack: () => void })
         </div>
         <label className={`flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg cursor-pointer hover:bg-primary/90 shrink-0 ${uploading ? "opacity-60 pointer-events-none" : ""}`}>
           {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-          {uploading ? `Subiendo ${uploadProgress?.done}/${uploadProgress?.total}...` : "Subir archivos"}
+          {uploading ? `Subiendo ${uploadProgress?.done}/${uploadProgress?.total}...` : "Subir contenido"}
           <input
             type="file"
             accept="image/*,video/*"
@@ -533,8 +533,8 @@ const AlbumContentView = ({ album, onBack }: { album: any; onBack: () => void })
       {!isLoading && items.length === 0 && !uploading && (
         <label className="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl py-16 cursor-pointer hover:border-primary transition-colors mb-4">
           <Upload size={32} className="text-muted-foreground mb-3" />
-          <p className="text-sm font-medium text-foreground">Subí fotos o videos del álbum</p>
-          <p className="text-xs text-muted-foreground mt-1">Podés seleccionar varios a la vez</p>
+          <p className="text-sm font-medium text-foreground">Subí contenido al álbum (fotos y videos)</p>
+          <p className="text-xs text-muted-foreground mt-1">Los archivos se publicarán automáticamente en la galería</p>
           <input type="file" accept="image/*,video/*" multiple onChange={(e) => e.target.files && uploadFotos(e.target.files)} className="hidden" />
         </label>
       )}
@@ -549,6 +549,7 @@ const AlbumContentView = ({ album, onBack }: { album: any; onBack: () => void })
               <div className="flex items-center gap-2 mb-2">
                 <Camera size={14} className="text-muted-foreground" />
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Fotos ({photos.length})</span>
+                <span className="text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded-full font-medium">Publicadas ✓</span>
               </div>
               <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 mb-6">
                 {photos.map((foto: any) => {
@@ -601,6 +602,7 @@ const AlbumContentView = ({ album, onBack }: { album: any; onBack: () => void })
               <div className="flex items-center gap-2 mb-2">
                 <Play size={14} className="text-primary" />
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Videos ({videos.length})</span>
+                <span className="text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded-full font-medium">Publicados ✓</span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {videos.map((vid: any) => {
