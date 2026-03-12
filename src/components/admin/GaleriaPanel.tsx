@@ -551,7 +551,6 @@ const AlbumContentView = ({ album, onBack }: { album: any; onBack: () => void })
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Fotos ({photos.length})</span>
                 <span className="text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded-full font-medium">Publicadas ✓</span>
               </div>
-              </div>
               <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 mb-6">
                 {photos.map((foto: any) => {
                   const isThumb = currentAlbum.miniatura_url === foto.imagen_url;
