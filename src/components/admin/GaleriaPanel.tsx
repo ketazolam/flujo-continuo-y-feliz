@@ -4,19 +4,30 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadImage } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Plus, Trash2, Upload, Loader2, Image, AlertCircle, Pencil, X, Camera, ChevronLeft, Star, Images,
+  Plus, Trash2, Upload, Loader2, Image, AlertCircle, Pencil, X,
+  Camera, ChevronLeft, Star, Images, Video, Play, Link,
 } from "lucide-react";
+
+type AlbumTipo = "fotos" | "videos";
+
+// ─── Helpers YouTube ──────────────────────────────────────────────────────────
+
+const getYoutubeId = (url: string): string | null => {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+  return match ? match[1] : null;
+};
+
+const getYoutubeThumbnail = (url: string) => {
+  const id = getYoutubeId(url);
+  return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null;
+};
 
 // ─── Album Form ───────────────────────────────────────────────────────────────
 
 const AlbumForm = ({
-  editingAlbum,
-  onSave,
-  onCancel,
+  editingAlbum, tipo, onSave, onCancel,
 }: {
-  editingAlbum?: any;
-  onSave: (album: any) => void;
-  onCancel: () => void;
+  editingAlbum?: any; tipo: AlbumTipo; onSave: (album: any) => void; onCancel: () => void;
 }) => {
   const { toast } = useToast();
   const [titulo, setTitulo] = useState(editingAlbum?.titulo ?? "");
@@ -39,7 +50,7 @@ const AlbumForm = ({
         miniatura_url = await uploadImage(miniaturaFile, "galeria");
       }
 
-      const payload: any = { titulo };
+      const payload: any = { titulo, tipo };
       payload.jornada = jornada.trim() || null;
       payload.descripcion = descripcion.trim() || null;
       payload.fecha_publicacion = fecha ? new Date(fecha).toISOString() : null;
@@ -66,63 +77,44 @@ const AlbumForm = ({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-card border border-border rounded-xl p-5 mb-6 space-y-3 relative"
-    >
+    <form onSubmit={handleSubmit} className="bg-card border border-border rounded-xl p-5 mb-6 space-y-3 relative">
       <button type="button" onClick={onCancel} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground">
         <X size={18} />
       </button>
       <h3 className="text-sm font-semibold text-foreground">
-        {editingAlbum ? "Editar álbum" : "Nuevo álbum"}
+        {editingAlbum ? "Editar álbum" : `Nuevo álbum de ${tipo}`}
       </h3>
 
       <input
-        placeholder="Título del álbum *"
-        value={titulo}
-        onChange={(e) => setTitulo(e.target.value)}
-        required
+        placeholder="Título del álbum *" value={titulo}
+        onChange={(e) => setTitulo(e.target.value)} required
         className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
       />
 
       <div className="grid grid-cols-2 gap-3">
         <input
-          placeholder="Jornada (ej: Jornada 5)"
-          value={jornada}
+          placeholder="Jornada (ej: Jornada 5)" value={jornada}
           onChange={(e) => setJornada(e.target.value)}
           className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
         />
         <input
-          type="date"
-          value={fecha}
-          onChange={(e) => setFecha(e.target.value)}
+          type="date" value={fecha} onChange={(e) => setFecha(e.target.value)}
           className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:border-primary"
         />
       </div>
 
       <textarea
-        placeholder="Descripción del álbum (opcional)"
-        value={descripcion}
-        onChange={(e) => setDescripcion(e.target.value)}
-        rows={2}
+        placeholder="Descripción (opcional)" value={descripcion}
+        onChange={(e) => setDescripcion(e.target.value)} rows={2}
         className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary resize-none"
       />
 
       <label className="flex items-center gap-2 px-4 py-3 bg-secondary border border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
         <Upload size={15} className="text-muted-foreground" />
         <span className="text-sm text-muted-foreground">
-          {miniaturaFile
-            ? miniaturaFile.name
-            : editingAlbum?.miniatura_url
-            ? "Reemplazar portada (opcional)"
-            : "Imagen de portada"}
+          {miniaturaFile ? miniaturaFile.name : editingAlbum?.miniatura_url ? "Reemplazar portada (opcional)" : "Imagen de portada"}
         </span>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setMiniaturaFile(e.target.files?.[0] || null)}
-          className="hidden"
-        />
+        <input type="file" accept="image/*" onChange={(e) => setMiniaturaFile(e.target.files?.[0] || null)} className="hidden" />
       </label>
 
       {editingAlbum?.miniatura_url && !miniaturaFile && (
@@ -130,13 +122,11 @@ const AlbumForm = ({
       )}
 
       <div className="flex items-center gap-3">
-        <button
-          type="submit"
-          disabled={saving}
+        <button type="submit" disabled={saving}
           className="px-6 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:bg-primary/90 flex items-center gap-2 disabled:opacity-50"
         >
           {saving && <Loader2 size={14} className="animate-spin" />}
-          {editingAlbum ? "Actualizar" : "Crear y agregar fotos →"}
+          {editingAlbum ? "Actualizar" : `Crear →`}
         </button>
         <button type="button" onClick={onCancel} className="text-sm text-muted-foreground hover:text-foreground">
           Cancelar
@@ -148,17 +138,23 @@ const AlbumForm = ({
 
 // ─── Albums List View ─────────────────────────────────────────────────────────
 
-const AlbumsView = ({ onOpenAlbum }: { onOpenAlbum: (album: any) => void }) => {
+const AlbumsView = ({
+  tipo, onOpenAlbum,
+}: {
+  tipo: AlbumTipo; onOpenAlbum: (album: any) => void;
+}) => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [editingAlbum, setEditingAlbum] = useState<any | null>(null);
 
+  const queryKey = ["albumes", tipo];
+
   const { data: albumes = [], isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["albumes"],
+    queryKey,
     queryFn: async () => {
       const [{ data: albumData, error: albumErr }, { data: countData }] = await Promise.all([
-        supabase.from("albumes").select("*").order("fecha_publicacion", { ascending: false }),
+        supabase.from("albumes").select("*").eq("tipo", tipo).order("fecha_publicacion", { ascending: false }),
         supabase.from("galeria").select("album_id").not("album_id", "is", null),
       ]);
       if (albumErr) throw albumErr;
@@ -166,7 +162,7 @@ const AlbumsView = ({ onOpenAlbum }: { onOpenAlbum: (album: any) => void }) => {
       for (const row of countData ?? []) {
         if (row.album_id) countMap[row.album_id] = (countMap[row.album_id] ?? 0) + 1;
       }
-      return (albumData ?? []).map((a) => ({ ...a, fotoCount: countMap[a.id] ?? 0 }));
+      return (albumData ?? []).map((a) => ({ ...a, itemCount: countMap[a.id] ?? 0 }));
     },
   });
 
@@ -174,24 +170,27 @@ const AlbumsView = ({ onOpenAlbum }: { onOpenAlbum: (album: any) => void }) => {
     await supabase.from("galeria").delete().eq("album_id", id);
     const { error } = await supabase.from("albumes").delete().eq("id", id);
     if (error) { toast({ title: "Error al eliminar", variant: "destructive" }); return; }
-    queryClient.invalidateQueries({ queryKey: ["albumes"] });
+    queryClient.invalidateQueries({ queryKey });
     toast({ title: "Álbum eliminado" });
   };
 
   const handleSaved = (album: any) => {
-    queryClient.invalidateQueries({ queryKey: ["albumes"] });
+    queryClient.invalidateQueries({ queryKey });
     setShowForm(false);
-    // Si es nuevo álbum, navegar directo a agregar fotos
-    if (!editingAlbum && album) {
-      onOpenAlbum(album);
-    }
+    if (!editingAlbum && album) onOpenAlbum(album);
     setEditingAlbum(null);
   };
 
+  const IconTipo = tipo === "videos" ? Video : Camera;
+  const labelTipo = tipo === "videos" ? "videos" : "fotos";
+
   return (
-    <div className="p-6">
+    <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="font-space font-bold uppercase text-2xl text-foreground">Galería — Álbumes</h2>
+        <div className="flex items-center gap-2">
+          <IconTipo size={20} className="text-primary" />
+          <span className="text-sm text-muted-foreground capitalize">{albumes.length} álbum{albumes.length !== 1 ? "es" : ""}</span>
+        </div>
         <button
           onClick={() => { setEditingAlbum(null); setShowForm(true); }}
           className="flex items-center gap-1 px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:bg-primary/90"
@@ -202,6 +201,7 @@ const AlbumsView = ({ onOpenAlbum }: { onOpenAlbum: (album: any) => void }) => {
 
       {(showForm || editingAlbum) && (
         <AlbumForm
+          tipo={tipo}
           editingAlbum={editingAlbum ?? undefined}
           onSave={handleSaved}
           onCancel={() => { setShowForm(false); setEditingAlbum(null); }}
@@ -209,18 +209,12 @@ const AlbumsView = ({ onOpenAlbum }: { onOpenAlbum: (album: any) => void }) => {
       )}
 
       {isLoading ? (
-        <div className="flex justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        </div>
+        <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : isError ? (
         <div className="text-center py-8 space-y-2">
           <AlertCircle className="h-8 w-8 text-destructive mx-auto" />
-          <p className="text-sm text-muted-foreground">
-            Error al cargar álbumes: {(error as any)?.message ?? "error desconocido"}
-          </p>
-          <button onClick={() => refetch()} className="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg">
-            Reintentar
-          </button>
+          <p className="text-sm text-muted-foreground">Error: {(error as any)?.message ?? "error desconocido"}</p>
+          <button onClick={() => refetch()} className="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg">Reintentar</button>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -235,26 +229,24 @@ const AlbumsView = ({ onOpenAlbum }: { onOpenAlbum: (album: any) => void }) => {
                   <img src={album.miniatura_url} alt={album.titulo} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <Camera size={28} className="text-muted-foreground" />
+                    <IconTipo size={28} className="text-muted-foreground" />
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
                   <span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 px-3 py-1.5 rounded-full flex items-center gap-1">
-                    <Images size={12} /> Ver fotos
+                    {tipo === "videos" ? <><Play size={12} /> Ver videos</> : <><Images size={12} /> Ver fotos</>}
                   </span>
                 </div>
-                {album.fotoCount > 0 && (
+                {album.itemCount > 0 && (
                   <span className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <Images size={9} /> {album.fotoCount}
+                    {tipo === "videos" ? <Video size={9} /> : <Images size={9} />} {album.itemCount}
                   </span>
                 )}
               </div>
               <div className="p-3">
                 <p className="text-foreground text-sm font-semibold truncate">{album.titulo}</p>
                 {album.jornada && <p className="text-xs text-primary truncate">{album.jornada}</p>}
-                {album.descripcion && (
-                  <p className="text-xs text-muted-foreground truncate mt-0.5">{album.descripcion}</p>
-                )}
+                {album.descripcion && <p className="text-xs text-muted-foreground truncate mt-0.5">{album.descripcion}</p>}
               </div>
               <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
@@ -274,12 +266,9 @@ const AlbumsView = ({ onOpenAlbum }: { onOpenAlbum: (album: any) => void }) => {
           ))}
           {albumes.length === 0 && !showForm && (
             <div className="col-span-full text-center text-muted-foreground py-12">
-              <Camera size={36} className="mx-auto mb-3 opacity-30" />
-              <p className="text-sm">No hay álbumes todavía.</p>
-              <button
-                onClick={() => setShowForm(true)}
-                className="mt-3 text-primary text-sm hover:underline"
-              >
+              <IconTipo size={36} className="mx-auto mb-3 opacity-30" />
+              <p className="text-sm">No hay álbumes de {labelTipo} todavía.</p>
+              <button onClick={() => setShowForm(true)} className="mt-3 text-primary text-sm hover:underline">
                 Crear el primero
               </button>
             </div>
@@ -290,7 +279,7 @@ const AlbumsView = ({ onOpenAlbum }: { onOpenAlbum: (album: any) => void }) => {
   );
 };
 
-// ─── Album Photos View ────────────────────────────────────────────────────────
+// ─── Album Fotos View ─────────────────────────────────────────────────────────
 
 const AlbumFotosView = ({ album, onBack }: { album: any; onBack: () => void }) => {
   const queryClient = useQueryClient();
@@ -303,10 +292,7 @@ const AlbumFotosView = ({ album, onBack }: { album: any; onBack: () => void }) =
     queryKey: ["album_fotos", currentAlbum.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("galeria")
-        .select("*")
-        .eq("album_id", currentAlbum.id)
-        .order("created_at", { ascending: true });
+        .from("galeria").select("*").eq("album_id", currentAlbum.id).order("created_at", { ascending: true });
       if (error) throw error;
       return data ?? [];
     },
@@ -316,8 +302,7 @@ const AlbumFotosView = ({ album, onBack }: { album: any; onBack: () => void }) =
     if (files.length === 0) return;
     setUploading(true);
     setUploadProgress({ done: 0, total: files.length });
-    let ok = 0;
-    let failed = 0;
+    let ok = 0; let failed = 0;
     for (const file of Array.from(files)) {
       try {
         const imagen_url = await uploadImage(file, "galeria");
@@ -329,84 +314,63 @@ const AlbumFotosView = ({ album, onBack }: { album: any; onBack: () => void }) =
         });
         if (error) throw error;
         ok++;
-      } catch {
-        failed++;
-      }
+      } catch { failed++; }
       setUploadProgress((prev) => prev ? { ...prev, done: prev.done + 1 } : null);
     }
     queryClient.invalidateQueries({ queryKey: ["album_fotos", currentAlbum.id] });
-    queryClient.invalidateQueries({ queryKey: ["albumes"] });
+    queryClient.invalidateQueries({ queryKey: ["albumes", "fotos"] });
     setUploading(false);
     setUploadProgress(null);
     if (ok > 0) toast({ title: `${ok} foto${ok !== 1 ? "s" : ""} subida${ok !== 1 ? "s" : ""}` });
-    if (failed > 0) toast({ title: `${failed} foto${failed !== 1 ? "s" : ""} no se pudo${failed !== 1 ? "n" : ""} subir`, variant: "destructive" });
+    if (failed > 0) toast({ title: `${failed} no se pudo${failed !== 1 ? "n" : ""} subir`, variant: "destructive" });
   };
 
   const deleteFoto = async (id: string) => {
     const { error } = await supabase.from("galeria").delete().eq("id", id);
     if (error) { toast({ title: "Error al eliminar", variant: "destructive" }); return; }
     queryClient.invalidateQueries({ queryKey: ["album_fotos", currentAlbum.id] });
-    queryClient.invalidateQueries({ queryKey: ["albumes"] });
+    queryClient.invalidateQueries({ queryKey: ["albumes", "fotos"] });
     toast({ title: "Foto eliminada" });
   };
 
   const setMiniatura = async (foto: any) => {
-    const { error } = await supabase
-      .from("albumes").update({ miniatura_url: foto.imagen_url }).eq("id", currentAlbum.id);
+    const { error } = await supabase.from("albumes").update({ miniatura_url: foto.imagen_url }).eq("id", currentAlbum.id);
     if (error) { toast({ title: "Error", variant: "destructive" }); return; }
-    queryClient.invalidateQueries({ queryKey: ["albumes"] });
+    queryClient.invalidateQueries({ queryKey: ["albumes", "fotos"] });
     setCurrentAlbum({ ...currentAlbum, miniatura_url: foto.imagen_url });
     toast({ title: "Portada actualizada" });
   };
 
   return (
-    <div className="p-6">
-      {/* Header */}
+    <div>
       <div className="flex items-center gap-3 mb-2">
         <button onClick={onBack} className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
           <ChevronLeft size={20} />
         </button>
         <div className="flex-1 min-w-0">
-          <h2 className="font-space font-bold uppercase text-xl text-foreground truncate">{currentAlbum.titulo}</h2>
+          <h3 className="font-bold text-foreground truncate">{currentAlbum.titulo}</h3>
           <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
             {currentAlbum.jornada && <span className="text-primary font-medium">{currentAlbum.jornada}</span>}
             <span>{fotos.length} foto{fotos.length !== 1 ? "s" : ""}</span>
-            {currentAlbum.miniatura_url && (
-              <span className="flex items-center gap-1 text-primary"><Star size={10} /> Portada configurada</span>
-            )}
+            {currentAlbum.miniatura_url && <span className="flex items-center gap-1 text-primary"><Star size={10} /> Portada configurada</span>}
           </div>
-          {currentAlbum.descripcion && (
-            <p className="text-xs text-muted-foreground mt-1">{currentAlbum.descripcion}</p>
-          )}
         </div>
         <label className={`flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg cursor-pointer hover:bg-primary/90 shrink-0 ${uploading ? "opacity-60 pointer-events-none" : ""}`}>
           {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
           {uploading ? `Subiendo ${uploadProgress?.done}/${uploadProgress?.total}...` : "Subir fotos"}
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => e.target.files && uploadFotos(e.target.files)}
-            className="hidden"
-            disabled={uploading}
-          />
+          <input type="file" accept="image/*" multiple onChange={(e) => e.target.files && uploadFotos(e.target.files)} className="hidden" disabled={uploading} />
         </label>
       </div>
 
-      {/* Barra de progreso */}
       {uploading && uploadProgress && (
         <div className="mb-4 mt-2">
           <div className="w-full bg-secondary rounded-full h-1.5">
-            <div
-              className="bg-primary h-1.5 rounded-full transition-all"
-              style={{ width: `${(uploadProgress.done / uploadProgress.total) * 100}%` }}
-            />
+            <div className="bg-primary h-1.5 rounded-full transition-all" style={{ width: `${(uploadProgress.done / uploadProgress.total) * 100}%` }} />
           </div>
           <p className="text-xs text-muted-foreground mt-1">{uploadProgress.done} de {uploadProgress.total} fotos subidas</p>
         </div>
       )}
 
-      {/* Zona de drop / primer upload */}
       {!isLoading && fotos.length === 0 && !uploading && (
         <label className="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl py-16 cursor-pointer hover:border-primary transition-colors mb-4">
           <Upload size={32} className="text-muted-foreground mb-3" />
@@ -416,7 +380,6 @@ const AlbumFotosView = ({ album, onBack }: { album: any; onBack: () => void }) =
         </label>
       )}
 
-      {/* Grid de fotos */}
       {isLoading ? (
         <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : (
@@ -428,9 +391,7 @@ const AlbumFotosView = ({ album, onBack }: { album: any; onBack: () => void }) =
                 {foto.imagen_url ? (
                   <img src={foto.imagen_url} alt={foto.titulo || ""} className="w-full h-full object-cover" loading="lazy" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Image size={24} className="text-muted-foreground" />
-                  </div>
+                  <div className="w-full h-full flex items-center justify-center"><Image size={24} className="text-muted-foreground" /></div>
                 )}
                 {isThumb && (
                   <div className="absolute top-1.5 left-1.5 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5 font-semibold">
@@ -439,11 +400,7 @@ const AlbumFotosView = ({ album, onBack }: { album: any; onBack: () => void }) =
                 )}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                   {!isThumb && foto.imagen_url && (
-                    <button
-                      onClick={() => setMiniatura(foto)}
-                      title="Usar como portada del álbum"
-                      className="p-2 bg-primary/80 rounded-lg text-white hover:bg-primary"
-                    >
+                    <button onClick={() => setMiniatura(foto)} title="Usar como portada" className="p-2 bg-primary/80 rounded-lg text-white hover:bg-primary">
                       <Star size={14} />
                     </button>
                   )}
@@ -460,16 +417,230 @@ const AlbumFotosView = ({ album, onBack }: { album: any; onBack: () => void }) =
   );
 };
 
+// ─── Album Videos View ────────────────────────────────────────────────────────
+
+const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [videoUrl, setVideoUrl] = useState("");
+  const [videoTitulo, setVideoTitulo] = useState("");
+  const [adding, setAdding] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [currentAlbum, setCurrentAlbum] = useState(album);
+
+  const { data: videos = [], isLoading } = useQuery({
+    queryKey: ["album_videos", currentAlbum.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("galeria").select("*").eq("album_id", currentAlbum.id).order("created_at", { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const addVideo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!videoUrl.trim()) return;
+    setAdding(true);
+    try {
+      const { error } = await supabase.from("galeria").insert({
+        titulo: videoTitulo.trim() || "Video",
+        tipo: "Video",
+        video_url: videoUrl.trim(),
+        album_id: currentAlbum.id,
+      });
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ["album_videos", currentAlbum.id] });
+      queryClient.invalidateQueries({ queryKey: ["albumes", "videos"] });
+      setVideoUrl("");
+      setVideoTitulo("");
+      setShowAddForm(false);
+      toast({ title: "Video agregado" });
+    } catch (err: any) {
+      toast({ title: `Error: ${err?.message}`, variant: "destructive" });
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const deleteVideo = async (id: string) => {
+    const { error } = await supabase.from("galeria").delete().eq("id", id);
+    if (error) { toast({ title: "Error al eliminar", variant: "destructive" }); return; }
+    queryClient.invalidateQueries({ queryKey: ["album_videos", currentAlbum.id] });
+    queryClient.invalidateQueries({ queryKey: ["albumes", "videos"] });
+    toast({ title: "Video eliminado" });
+  };
+
+  const setMiniatura = async (thumb: string) => {
+    const { error } = await supabase.from("albumes").update({ miniatura_url: thumb }).eq("id", currentAlbum.id);
+    if (error) { toast({ title: "Error", variant: "destructive" }); return; }
+    queryClient.invalidateQueries({ queryKey: ["albumes", "videos"] });
+    setCurrentAlbum({ ...currentAlbum, miniatura_url: thumb });
+    toast({ title: "Portada actualizada" });
+  };
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-4">
+        <button onClick={onBack} className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
+          <ChevronLeft size={20} />
+        </button>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-bold text-foreground truncate">{currentAlbum.titulo}</h3>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+            {currentAlbum.jornada && <span className="text-primary font-medium">{currentAlbum.jornada}</span>}
+            <span>{videos.length} video{videos.length !== 1 ? "s" : ""}</span>
+          </div>
+        </div>
+        <button
+          onClick={() => setShowAddForm((v) => !v)}
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:bg-primary/90 shrink-0"
+        >
+          <Plus size={14} /> Agregar video
+        </button>
+      </div>
+
+      {/* Formulario agregar video */}
+      {showAddForm && (
+        <form onSubmit={addVideo} className="bg-card border border-border rounded-xl p-4 mb-4 space-y-3">
+          <p className="text-sm font-semibold text-foreground">Agregar video</p>
+          <input
+            placeholder="URL de YouTube (ej: https://youtube.com/watch?v=...)"
+            value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} required
+            className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
+          />
+          <input
+            placeholder="Título del video (opcional)"
+            value={videoTitulo} onChange={(e) => setVideoTitulo(e.target.value)}
+            className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
+          />
+          {/* Preview miniatura */}
+          {videoUrl && getYoutubeThumbnail(videoUrl) && (
+            <img src={getYoutubeThumbnail(videoUrl)!} alt="preview" className="h-20 rounded-lg object-cover" />
+          )}
+          <div className="flex gap-3">
+            <button type="submit" disabled={adding}
+              className="px-5 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:bg-primary/90 flex items-center gap-2 disabled:opacity-50"
+            >
+              {adding && <Loader2 size={13} className="animate-spin" />}
+              Agregar
+            </button>
+            <button type="button" onClick={() => setShowAddForm(false)} className="text-sm text-muted-foreground hover:text-foreground">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      )}
+
+      {!isLoading && videos.length === 0 && !showAddForm && (
+        <div
+          className="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl py-16 cursor-pointer hover:border-primary transition-colors mb-4"
+          onClick={() => setShowAddForm(true)}
+        >
+          <Link size={32} className="text-muted-foreground mb-3" />
+          <p className="text-sm font-medium text-foreground">Agregar videos de YouTube</p>
+          <p className="text-xs text-muted-foreground mt-1">Click para agregar el primero</p>
+        </div>
+      )}
+
+      {isLoading ? (
+        <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {videos.map((video: any) => {
+            const thumb = video.video_url ? getYoutubeThumbnail(video.video_url) : null;
+            const isThumb = currentAlbum.miniatura_url && thumb && currentAlbum.miniatura_url === thumb;
+            return (
+              <div key={video.id} className="rounded-xl overflow-hidden relative group bg-secondary border border-border">
+                <div className="aspect-video relative">
+                  {thumb ? (
+                    <img src={thumb} alt={video.titulo || ""} className="w-full h-full object-cover" loading="lazy" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center"><Video size={28} className="text-muted-foreground" /></div>
+                  )}
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                    <Play size={22} className="text-white/60" />
+                  </div>
+                  {isThumb && (
+                    <div className="absolute top-1.5 left-1.5 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5 font-semibold">
+                      <Star size={9} /> Portada
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                    {!isThumb && thumb && (
+                      <button onClick={() => setMiniatura(thumb)} title="Usar como portada" className="p-2 bg-primary/80 rounded-lg text-white hover:bg-primary">
+                        <Star size={14} />
+                      </button>
+                    )}
+                    <button onClick={() => deleteVideo(video.id)} className="p-2 bg-destructive/80 rounded-lg text-white hover:bg-destructive">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+                <div className="px-3 py-2">
+                  <p className="text-foreground text-xs font-medium truncate">{video.titulo || "Sin título"}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ─── Main Panel ───────────────────────────────────────────────────────────────
 
 const GaleriaPanel = () => {
+  const [activeTab, setActiveTab] = useState<AlbumTipo>("fotos");
   const [selectedAlbum, setSelectedAlbum] = useState<any | null>(null);
 
-  if (selectedAlbum) {
-    return <AlbumFotosView album={selectedAlbum} onBack={() => setSelectedAlbum(null)} />;
-  }
+  const handleOpenAlbum = (album: any) => setSelectedAlbum(album);
+  const handleBack = () => setSelectedAlbum(null);
 
-  return <AlbumsView onOpenAlbum={setSelectedAlbum} />;
+  return (
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="font-space font-bold uppercase text-2xl text-foreground">Galería</h2>
+      </div>
+
+      {/* Tabs */}
+      {!selectedAlbum && (
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setActiveTab("fotos")}
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "fotos"
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Camera size={15} /> Fotos
+          </button>
+          <button
+            onClick={() => setActiveTab("videos")}
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "videos"
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Video size={15} /> Videos
+          </button>
+        </div>
+      )}
+
+      {selectedAlbum ? (
+        activeTab === "fotos" ? (
+          <AlbumFotosView album={selectedAlbum} onBack={handleBack} />
+        ) : (
+          <AlbumVideosView album={selectedAlbum} onBack={handleBack} />
+        )
+      ) : (
+        <AlbumsView tipo={activeTab} onOpenAlbum={handleOpenAlbum} />
+      )}
+    </div>
+  );
 };
 
 export default GaleriaPanel;
