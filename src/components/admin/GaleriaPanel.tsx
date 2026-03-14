@@ -524,27 +524,43 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
         <form onSubmit={addVideo} className="bg-card border border-border rounded-xl p-4 mb-4 space-y-3">
           <p className="text-sm font-semibold text-foreground">Agregar video</p>
           <input
-            placeholder="URL de YouTube (ej: https://youtube.com/watch?v=...)"
-            value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} required
-            className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
-          />
-          <input
             placeholder="Título del video (opcional)"
             value={videoTitulo} onChange={(e) => setVideoTitulo(e.target.value)}
             className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
           />
-          {/* Preview miniatura */}
+          <input
+            placeholder="URL de YouTube (ej: https://youtube.com/watch?v=...)"
+            value={videoUrl} onChange={(e) => { setVideoUrl(e.target.value); if (e.target.value) setVideoFile(null); }}
+            className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
+          />
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex-1 h-px bg-border" />
+            <span>o subí un archivo</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+          <label className="flex items-center gap-2 px-4 py-3 bg-secondary border border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
+            <Upload size={15} className="text-muted-foreground" />
+            <span className="text-sm text-muted-foreground truncate">
+              {videoFile ? videoFile.name : "Subir video (.mp4, .webm, .mov)"}
+            </span>
+            <input type="file" accept="video/*" onChange={(e) => { setVideoFile(e.target.files?.[0] || null); if (e.target.files?.[0]) setVideoUrl(""); }} className="hidden" />
+          </label>
+          {/* Preview miniatura YouTube */}
           {videoUrl && getYoutubeThumbnail(videoUrl) && (
             <img src={getYoutubeThumbnail(videoUrl)!} alt="preview" className="h-20 rounded-lg object-cover" />
           )}
+          {/* Preview video file */}
+          {videoFile && (
+            <video src={URL.createObjectURL(videoFile)} controls className="h-20 rounded-lg" />
+          )}
           <div className="flex gap-3">
-            <button type="submit" disabled={adding}
+            <button type="submit" disabled={adding || (!videoUrl.trim() && !videoFile)}
               className="px-5 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:bg-primary/90 flex items-center gap-2 disabled:opacity-50"
             >
-              {adding && <Loader2 size={13} className="animate-spin" />}
-              Agregar
+              {(adding || uploading) && <Loader2 size={13} className="animate-spin" />}
+              {uploading ? "Subiendo..." : "Agregar"}
             </button>
-            <button type="button" onClick={() => setShowAddForm(false)} className="text-sm text-muted-foreground hover:text-foreground">
+            <button type="button" onClick={() => { setShowAddForm(false); setVideoFile(null); }} className="text-sm text-muted-foreground hover:text-foreground">
               Cancelar
             </button>
           </div>
