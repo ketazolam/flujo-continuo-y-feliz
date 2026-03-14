@@ -109,16 +109,20 @@ const AlbumForm = ({
         className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary resize-none"
       />
 
-      <label className="flex items-center gap-2 px-4 py-3 bg-secondary border border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
-        <Upload size={15} className="text-muted-foreground" />
-        <span className="text-sm text-muted-foreground">
-          {miniaturaFile ? miniaturaFile.name : editingAlbum?.miniatura_url ? "Reemplazar portada (opcional)" : "Imagen de portada"}
-        </span>
-        <input type="file" accept="image/*" onChange={(e) => setMiniaturaFile(e.target.files?.[0] || null)} className="hidden" />
-      </label>
+      {tipo === "fotos" && (
+        <>
+          <label className="flex items-center gap-2 px-4 py-3 bg-secondary border border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
+            <Upload size={15} className="text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
+              {miniaturaFile ? miniaturaFile.name : editingAlbum?.miniatura_url ? "Reemplazar portada (opcional)" : "Imagen de portada"}
+            </span>
+            <input type="file" accept="image/*" onChange={(e) => setMiniaturaFile(e.target.files?.[0] || null)} className="hidden" />
+          </label>
 
-      {editingAlbum?.miniatura_url && !miniaturaFile && (
-        <img src={editingAlbum.miniatura_url} alt="Portada actual" className="h-20 w-auto rounded-lg object-cover" />
+          {editingAlbum?.miniatura_url && !miniaturaFile && (
+            <img src={editingAlbum.miniatura_url} alt="Portada actual" className="h-20 w-auto rounded-lg object-cover" />
+          )}
+        </>
       )}
 
       <div className="flex items-center gap-3">
