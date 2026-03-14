@@ -593,7 +593,7 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
                 </div>
                 <div className="px-3 py-2">
                   <p className="text-foreground text-xs font-medium truncate">{video.titulo || "Sin título"}</p>
-                  <p className="text-[10px] text-muted-foreground">{isDirectVideo ? "Archivo" : "YouTube"}</p>
+                  <p className="text-[10px] text-muted-foreground">{isDirect ? "Archivo" : "YouTube"}</p>
                 </div>
               </div>
             );
