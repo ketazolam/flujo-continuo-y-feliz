@@ -109,16 +109,20 @@ const AlbumForm = ({
         className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary resize-none"
       />
 
-      <label className="flex items-center gap-2 px-4 py-3 bg-secondary border border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
-        <Upload size={15} className="text-muted-foreground" />
-        <span className="text-sm text-muted-foreground">
-          {miniaturaFile ? miniaturaFile.name : editingAlbum?.miniatura_url ? "Reemplazar portada (opcional)" : "Imagen de portada"}
-        </span>
-        <input type="file" accept="image/*" onChange={(e) => setMiniaturaFile(e.target.files?.[0] || null)} className="hidden" />
-      </label>
+      {tipo === "fotos" && (
+        <>
+          <label className="flex items-center gap-2 px-4 py-3 bg-secondary border border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
+            <Upload size={15} className="text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
+              {miniaturaFile ? miniaturaFile.name : editingAlbum?.miniatura_url ? "Reemplazar portada (opcional)" : "Imagen de portada"}
+            </span>
+            <input type="file" accept="image/*" onChange={(e) => setMiniaturaFile(e.target.files?.[0] || null)} className="hidden" />
+          </label>
 
-      {editingAlbum?.miniatura_url && !miniaturaFile && (
-        <img src={editingAlbum.miniatura_url} alt="Portada actual" className="h-20 w-auto rounded-lg object-cover" />
+          {editingAlbum?.miniatura_url && !miniaturaFile && (
+            <img src={editingAlbum.miniatura_url} alt="Portada actual" className="h-20 w-auto rounded-lg object-cover" />
+          )}
+        </>
       )}
 
       <div className="flex items-center gap-3">
@@ -424,7 +428,9 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
   const { toast } = useToast();
   const [videoUrl, setVideoUrl] = useState("");
   const [videoTitulo, setVideoTitulo] = useState("");
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [adding, setAdding] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [currentAlbum, setCurrentAlbum] = useState(album);
 
@@ -440,13 +446,24 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
 
   const addVideo = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!videoUrl.trim()) return;
+    if (!videoUrl.trim() && !videoFile) return;
     setAdding(true);
     try {
+      let finalVideoUrl = videoUrl.trim() || null;
+      let imagenUrl: string | null = null;
+
+      if (videoFile) {
+        setUploading(true);
+        const uploaded = await uploadImage(videoFile, "galeria");
+        imagenUrl = uploaded; // stored as imagen_url for direct .mp4
+        setUploading(false);
+      }
+
       const { error } = await supabase.from("galeria").insert({
-        titulo: videoTitulo.trim() || "Video",
+        titulo: videoTitulo.trim() || videoFile?.name.replace(/\.[^.]+$/, "") || "Video",
         tipo: "Video",
-        video_url: videoUrl.trim(),
+        video_url: finalVideoUrl,
+        imagen_url: imagenUrl,
         album_id: currentAlbum.id,
       });
       if (error) throw error;
@@ -454,12 +471,14 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
       queryClient.invalidateQueries({ queryKey: ["albumes", "videos"] });
       setVideoUrl("");
       setVideoTitulo("");
+      setVideoFile(null);
       setShowAddForm(false);
       toast({ title: "Video agregado" });
     } catch (err: any) {
       toast({ title: `Error: ${err?.message}`, variant: "destructive" });
     } finally {
       setAdding(false);
+      setUploading(false);
     }
   };
 
@@ -471,13 +490,6 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
     toast({ title: "Video eliminado" });
   };
 
-  const setMiniatura = async (thumb: string) => {
-    const { error } = await supabase.from("albumes").update({ miniatura_url: thumb }).eq("id", currentAlbum.id);
-    if (error) { toast({ title: "Error", variant: "destructive" }); return; }
-    queryClient.invalidateQueries({ queryKey: ["albumes", "videos"] });
-    setCurrentAlbum({ ...currentAlbum, miniatura_url: thumb });
-    toast({ title: "Portada actualizada" });
-  };
 
   return (
     <div>
@@ -505,27 +517,43 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
         <form onSubmit={addVideo} className="bg-card border border-border rounded-xl p-4 mb-4 space-y-3">
           <p className="text-sm font-semibold text-foreground">Agregar video</p>
           <input
-            placeholder="URL de YouTube (ej: https://youtube.com/watch?v=...)"
-            value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} required
-            className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
-          />
-          <input
             placeholder="Título del video (opcional)"
             value={videoTitulo} onChange={(e) => setVideoTitulo(e.target.value)}
             className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
           />
-          {/* Preview miniatura */}
+          <input
+            placeholder="URL de YouTube (ej: https://youtube.com/watch?v=...)"
+            value={videoUrl} onChange={(e) => { setVideoUrl(e.target.value); if (e.target.value) setVideoFile(null); }}
+            className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
+          />
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex-1 h-px bg-border" />
+            <span>o subí un archivo</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+          <label className="flex items-center gap-2 px-4 py-3 bg-secondary border border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
+            <Upload size={15} className="text-muted-foreground" />
+            <span className="text-sm text-muted-foreground truncate">
+              {videoFile ? videoFile.name : "Subir video (.mp4, .webm, .mov)"}
+            </span>
+            <input type="file" accept="video/*" onChange={(e) => { setVideoFile(e.target.files?.[0] || null); if (e.target.files?.[0]) setVideoUrl(""); }} className="hidden" />
+          </label>
+          {/* Preview miniatura YouTube */}
           {videoUrl && getYoutubeThumbnail(videoUrl) && (
             <img src={getYoutubeThumbnail(videoUrl)!} alt="preview" className="h-20 rounded-lg object-cover" />
           )}
+          {/* Preview video file */}
+          {videoFile && (
+            <video src={URL.createObjectURL(videoFile)} controls className="h-20 rounded-lg" />
+          )}
           <div className="flex gap-3">
-            <button type="submit" disabled={adding}
+            <button type="submit" disabled={adding || (!videoUrl.trim() && !videoFile)}
               className="px-5 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:bg-primary/90 flex items-center gap-2 disabled:opacity-50"
             >
-              {adding && <Loader2 size={13} className="animate-spin" />}
-              Agregar
+              {(adding || uploading) && <Loader2 size={13} className="animate-spin" />}
+              {uploading ? "Subiendo..." : "Agregar"}
             </button>
-            <button type="button" onClick={() => setShowAddForm(false)} className="text-sm text-muted-foreground hover:text-foreground">
+            <button type="button" onClick={() => { setShowAddForm(false); setVideoFile(null); }} className="text-sm text-muted-foreground hover:text-foreground">
               Cancelar
             </button>
           </div>
@@ -537,8 +565,8 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
           className="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl py-16 cursor-pointer hover:border-primary transition-colors mb-4"
           onClick={() => setShowAddForm(true)}
         >
-          <Link size={32} className="text-muted-foreground mb-3" />
-          <p className="text-sm font-medium text-foreground">Agregar videos de YouTube</p>
+          <Upload size={32} className="text-muted-foreground mb-3" />
+          <p className="text-sm font-medium text-foreground">Subir videos o agregar desde YouTube</p>
           <p className="text-xs text-muted-foreground mt-1">Click para agregar el primero</p>
         </div>
       )}
@@ -549,11 +577,13 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {videos.map((video: any) => {
             const thumb = video.video_url ? getYoutubeThumbnail(video.video_url) : null;
-            const isThumb = currentAlbum.miniatura_url && thumb && currentAlbum.miniatura_url === thumb;
+            const isDirectVideo = video.imagen_url && /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(video.imagen_url);
             return (
               <div key={video.id} className="rounded-xl overflow-hidden relative group bg-secondary border border-border">
                 <div className="aspect-video relative">
-                  {thumb ? (
+                  {isDirectVideo ? (
+                    <video src={video.imagen_url} muted preload="metadata" className="w-full h-full object-cover" />
+                  ) : thumb ? (
                     <img src={thumb} alt={video.titulo || ""} className="w-full h-full object-cover" loading="lazy" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center"><Video size={28} className="text-muted-foreground" /></div>
@@ -561,17 +591,7 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                     <Play size={22} className="text-white/60" />
                   </div>
-                  {isThumb && (
-                    <div className="absolute top-1.5 left-1.5 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5 font-semibold">
-                      <Star size={9} /> Portada
-                    </div>
-                  )}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                    {!isThumb && thumb && (
-                      <button onClick={() => setMiniatura(thumb)} title="Usar como portada" className="p-2 bg-primary/80 rounded-lg text-white hover:bg-primary">
-                        <Star size={14} />
-                      </button>
-                    )}
                     <button onClick={() => deleteVideo(video.id)} className="p-2 bg-destructive/80 rounded-lg text-white hover:bg-destructive">
                       <Trash2 size={14} />
                     </button>
@@ -579,6 +599,7 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
                 </div>
                 <div className="px-3 py-2">
                   <p className="text-foreground text-xs font-medium truncate">{video.titulo || "Sin título"}</p>
+                  <p className="text-[10px] text-muted-foreground">{isDirectVideo ? "Archivo" : "YouTube"}</p>
                 </div>
               </div>
             );
