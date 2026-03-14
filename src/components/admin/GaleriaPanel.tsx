@@ -569,8 +569,9 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {videos.map((video: any) => {
-            const thumb = video.video_url ? getYoutubeThumbnail(video.video_url) : null;
-            const isDirectVideo = video.imagen_url && /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(video.imagen_url);
+            const videoSrc = resolveVideoSource(video);
+            const thumb = getYoutubeThumbnail(videoSrc);
+            const isDirect = isDirectVideoFile(videoSrc);
             return (
               <div key={video.id} className="rounded-xl overflow-hidden relative group bg-secondary border border-border">
                 <div className="aspect-video relative">
