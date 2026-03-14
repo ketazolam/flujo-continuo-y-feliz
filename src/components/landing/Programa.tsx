@@ -16,8 +16,10 @@ const getThumb = (ep: any) => {
 
 const getEmbedUrl = (url: string) => {
   const ytId = getYoutubeId(url);
-  return ytId ? `https://www.youtube.com/embed/${ytId}?autoplay=1` : url;
+  return ytId ? `https://www.youtube.com/embed/${ytId}?autoplay=1` : null;
 };
+
+const isDirectVideo = (url: string) => !getYoutubeId(url);
 
 const Programa = () => {
   const [activeEp, setActiveEp] = useState<any | null>(null);
