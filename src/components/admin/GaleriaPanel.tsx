@@ -572,8 +572,8 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
           className="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl py-16 cursor-pointer hover:border-primary transition-colors mb-4"
           onClick={() => setShowAddForm(true)}
         >
-          <Link size={32} className="text-muted-foreground mb-3" />
-          <p className="text-sm font-medium text-foreground">Agregar videos de YouTube</p>
+          <Upload size={32} className="text-muted-foreground mb-3" />
+          <p className="text-sm font-medium text-foreground">Subir videos o agregar desde YouTube</p>
           <p className="text-xs text-muted-foreground mt-1">Click para agregar el primero</p>
         </div>
       )}
