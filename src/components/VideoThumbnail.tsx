@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Play } from "lucide-react";
 
 interface VideoThumbnailProps {
-  src: string;
+  src: string | null | undefined;
   alt?: string;
   className?: string;
 }
@@ -10,23 +10,30 @@ interface VideoThumbnailProps {
 const VideoThumbnail = ({ src, alt = "", className = "" }: VideoThumbnailProps) => {
   const [thumbUrl, setThumbUrl] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
-  const attempted = useRef(false);
 
   useEffect(() => {
-    if (attempted.current) return;
-    attempted.current = true;
+    if (!src) {
+      setFailed(true);
+      return;
+    }
+
+    setThumbUrl(null);
+    setFailed(false);
 
     const video = document.createElement("video");
     video.crossOrigin = "anonymous";
     video.muted = true;
     video.preload = "auto";
+    let cancelled = false;
 
     const cleanup = () => {
+      cancelled = true;
       video.removeAttribute("src");
       video.load();
     };
 
     video.addEventListener("seeked", () => {
+      if (cancelled) return;
       try {
         const canvas = document.createElement("canvas");
         canvas.width = video.videoWidth || 640;
@@ -39,20 +46,19 @@ const VideoThumbnail = ({ src, alt = "", className = "" }: VideoThumbnailProps) 
       } catch {
         setFailed(true);
       }
-      cleanup();
     }, { once: true });
 
     video.addEventListener("error", () => {
-      setFailed(true);
-      cleanup();
+      if (!cancelled) setFailed(true);
+    }, { once: true });
+
+    video.addEventListener("loadeddata", () => {
+      if (!cancelled) video.currentTime = 1;
     }, { once: true });
 
     video.src = src;
-    video.addEventListener("loadeddata", () => {
-      video.currentTime = 1;
-    }, { once: true });
 
-    return () => cleanup();
+    return cleanup;
   }, [src]);
 
   if (thumbUrl) {
@@ -67,7 +73,6 @@ const VideoThumbnail = ({ src, alt = "", className = "" }: VideoThumbnailProps) 
     );
   }
 
-  // Loading placeholder
   return <div className={`bg-secondary animate-pulse ${className}`} />;
 };
 

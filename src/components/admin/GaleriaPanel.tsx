@@ -13,15 +13,7 @@ type AlbumTipo = "fotos" | "videos";
 
 // ─── Helpers YouTube ──────────────────────────────────────────────────────────
 
-const getYoutubeId = (url: string): string | null => {
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
-  return match ? match[1] : null;
-};
-
-const getYoutubeThumbnail = (url: string) => {
-  const id = getYoutubeId(url);
-  return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null;
-};
+import { getYoutubeId, getYoutubeThumbnail, resolveVideoSource, isDirectVideoFile } from "@/lib/video-utils";
 
 // ─── Album Form ───────────────────────────────────────────────────────────────
 
@@ -456,7 +448,9 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
       if (videoFile) {
         setUploading(true);
         const uploaded = await uploadImage(videoFile, "galeria");
-        imagenUrl = uploaded; // stored as imagen_url for direct .mp4
+        imagenUrl = uploaded;
+        // Also set as video_url for consistency
+        if (!finalVideoUrl) finalVideoUrl = uploaded;
         setUploading(false);
       }
 
@@ -577,15 +571,16 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {videos.map((video: any) => {
-            const thumb = video.video_url ? getYoutubeThumbnail(video.video_url) : null;
-            const isDirectVideo = video.imagen_url && /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(video.imagen_url);
+            const videoSrc = resolveVideoSource(video);
+            const thumb = getYoutubeThumbnail(videoSrc);
+            const isDirect = isDirectVideoFile(videoSrc);
             return (
               <div key={video.id} className="rounded-xl overflow-hidden relative group bg-secondary border border-border">
                 <div className="aspect-video relative">
-                  {isDirectVideo ? (
-                    <VideoThumbnail src={video.imagen_url} alt={video.titulo || ""} className="w-full h-full object-cover" />
-                  ) : thumb ? (
+                  {thumb ? (
                     <img src={thumb} alt={video.titulo || ""} className="w-full h-full object-cover" loading="lazy" />
+                  ) : isDirect && videoSrc ? (
+                    <VideoThumbnail src={videoSrc} alt={video.titulo || ""} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center"><Video size={28} className="text-muted-foreground" /></div>
                   )}
@@ -600,7 +595,7 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
                 </div>
                 <div className="px-3 py-2">
                   <p className="text-foreground text-xs font-medium truncate">{video.titulo || "Sin título"}</p>
-                  <p className="text-[10px] text-muted-foreground">{isDirectVideo ? "Archivo" : "YouTube"}</p>
+                  <p className="text-[10px] text-muted-foreground">{isDirect ? "Archivo" : "YouTube"}</p>
                 </div>
               </div>
             );

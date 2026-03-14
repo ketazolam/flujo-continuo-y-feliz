@@ -5,18 +5,15 @@ import { uploadImage } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Pencil, Loader2, X, Tv, Play, Upload, Eye, Image } from "lucide-react";
 
-const getYoutubeId = (url: string): string | null => {
-  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
-  return m ? m[1] : null;
-};
+import VideoThumbnail from "@/components/VideoThumbnail";
+import { getYoutubeId, getYoutubeThumbnail, isDirectVideoFile } from "@/lib/video-utils";
 
 const getThumb = (ep: any) => {
   if (ep.miniatura_url) return ep.miniatura_url;
-  const ytId = getYoutubeId(ep.video_url ?? "");
-  return ytId ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : null;
+  return getYoutubeThumbnail(ep.video_url);
 };
 
-const isDirectVideo = (url: string) => !getYoutubeId(url);
+const isDirectVideo = (url?: string | null) => isDirectVideoFile(url);
 
 const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () => void; onCancel: () => void }) => {
   const { toast } = useToast();
@@ -137,7 +134,7 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
           {/* If direct video and no thumb, show video frame */}
           {!thumbFile && !currentThumb && videoUrl && isDirectVideo(videoUrl) && (
             <div className="w-24 h-14 rounded-lg overflow-hidden bg-secondary flex-shrink-0 border border-border">
-              <video src={videoUrl} muted preload="metadata" className="w-full h-full object-cover" />
+              <VideoThumbnail src={videoUrl} alt="Preview" className="w-full h-full object-cover" />
             </div>
           )}
           <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground hover:text-foreground border border-dashed border-border rounded-lg px-3 py-2 hover:border-primary/50 transition-colors flex-1">
@@ -231,7 +228,7 @@ const ProgramaPanel = () => {
                   {thumb ? (
                     <img src={thumb} alt={ep.titulo} className="w-full h-full object-cover" />
                   ) : direct ? (
-                    <video src={ep.video_url} muted preload="metadata" className="w-full h-full object-cover" />
+                    <VideoThumbnail src={ep.video_url} alt={ep.titulo} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center"><Play size={18} className="text-muted-foreground" /></div>
                   )}
