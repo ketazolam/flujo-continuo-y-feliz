@@ -7,6 +7,7 @@ import {
   Plus, Trash2, Upload, Loader2, Image, AlertCircle, Pencil, X,
   Camera, ChevronLeft, Star, Images, Video, Play, Link,
 } from "lucide-react";
+import VideoThumbnail from "@/components/VideoThumbnail";
 
 type AlbumTipo = "fotos" | "videos";
 
