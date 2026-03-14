@@ -360,8 +360,12 @@ const AlbumesSectionGrid = ({
         onClick={() => onSelect(album)}
       >
         <div className="aspect-[4/3] relative overflow-hidden">
-          {album.miniatura_url ? (
+         {album.miniatura_url ? (
             <SafeImage src={album.miniatura_url} alt={album.titulo} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+          ) : album.firstVideoUrl && !getYoutubeId(album.firstVideoUrl) ? (
+            <video src={album.firstVideoUrl} className="w-full h-full object-cover" muted preload="metadata" />
+          ) : album.firstVideoUrl && getYoutubeId(album.firstVideoUrl) ? (
+            <img src={`https://img.youtube.com/vi/${getYoutubeId(album.firstVideoUrl)}/mqdefault.jpg`} alt={album.titulo} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
           ) : (
             <div className="w-full h-full bg-secondary flex items-center justify-center">
               {tipo === "videos" ? <Video size={22} className="text-muted-foreground" /> : <Camera size={22} className="text-muted-foreground" />}
