@@ -364,7 +364,7 @@ const AlbumesSectionGrid = ({
          {album.miniatura_url ? (
             <SafeImage src={album.miniatura_url} alt={album.titulo} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
           ) : album.firstVideoUrl && !getYoutubeId(album.firstVideoUrl) ? (
-            <video src={album.firstVideoUrl} className="w-full h-full object-cover" muted preload="metadata" />
+            <VideoThumbnail src={album.firstVideoUrl} alt={album.titulo} className="w-full h-full object-cover" />
           ) : album.firstVideoUrl && getYoutubeId(album.firstVideoUrl) ? (
             <img src={`https://img.youtube.com/vi/${getYoutubeId(album.firstVideoUrl)}/mqdefault.jpg`} alt={album.titulo} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
           ) : (

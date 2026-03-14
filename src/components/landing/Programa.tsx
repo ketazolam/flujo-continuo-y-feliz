@@ -194,7 +194,7 @@ const Programa = () => {
                       {thumb ? (
                         <img src={thumb} alt={ep.titulo} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
                       ) : direct ? (
-                        <video src={ep.video_url} className="absolute inset-0 w-full h-full object-cover" muted preload="metadata" />
+                        <VideoThumbnail src={ep.video_url} alt={ep.titulo} className="absolute inset-0 w-full h-full object-cover" />
                       ) : (
                         <div className="absolute inset-0 bg-secondary flex items-center justify-center">
                           <Play size={24} className="text-muted-foreground" />
