@@ -580,10 +580,8 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
                   ) : isDirect && videoSrc ? (
                     <VideoThumbnail src={videoSrc} alt={video.titulo || ""} className="w-full h-full object-cover" />
                   ) : (
-                    <img src={thumb} alt={video.titulo || ""} className="w-full h-full object-cover" loading="lazy" />
-                  ) : (
                     <div className="w-full h-full flex items-center justify-center"><Video size={28} className="text-muted-foreground" /></div>
-                  )}
+                  )
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                     <Play size={22} className="text-white/60" />
                   </div>
