@@ -125,18 +125,15 @@ export function Pricing({
                 ))}
               </ul>
               <hr className="border-border" />
-              <a
-                href={plan.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
+              <button
+                onClick={(e) => { e.stopPropagation(); window.open(plan.href, "_blank"); }}
                 className={cn(
                   buttonVariants({ variant: plan.isPopular ? "default" : "outline" }),
                   "w-full"
                 )}
               >
                 {plan.buttonText}
-              </a>
+              </button>
               <p className="text-xs text-center text-muted-foreground">{plan.description}</p>
             </div>
           </motion.div>
