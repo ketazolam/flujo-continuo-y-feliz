@@ -466,6 +466,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_programa_view: {
+        Args: { ep_id: string; view_type: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
