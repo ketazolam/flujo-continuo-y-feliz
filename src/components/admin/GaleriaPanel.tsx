@@ -490,13 +490,6 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
     toast({ title: "Video eliminado" });
   };
 
-  const setMiniatura = async (thumb: string) => {
-    const { error } = await supabase.from("albumes").update({ miniatura_url: thumb }).eq("id", currentAlbum.id);
-    if (error) { toast({ title: "Error", variant: "destructive" }); return; }
-    queryClient.invalidateQueries({ queryKey: ["albumes", "videos"] });
-    setCurrentAlbum({ ...currentAlbum, miniatura_url: thumb });
-    toast({ title: "Portada actualizada" });
-  };
 
   return (
     <div>
