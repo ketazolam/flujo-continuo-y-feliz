@@ -575,9 +575,11 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
             return (
               <div key={video.id} className="rounded-xl overflow-hidden relative group bg-secondary border border-border">
                 <div className="aspect-video relative">
-                  {isDirectVideo ? (
-                    <VideoThumbnail src={video.imagen_url} alt={video.titulo || ""} className="w-full h-full object-cover" />
-                  ) : thumb ? (
+                  {thumb ? (
+                    <img src={thumb} alt={video.titulo || ""} className="w-full h-full object-cover" loading="lazy" />
+                  ) : isDirect && videoSrc ? (
+                    <VideoThumbnail src={videoSrc} alt={video.titulo || ""} className="w-full h-full object-cover" />
+                  ) : (
                     <img src={thumb} alt={video.titulo || ""} className="w-full h-full object-cover" loading="lazy" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center"><Video size={28} className="text-muted-foreground" /></div>
