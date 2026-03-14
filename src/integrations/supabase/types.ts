@@ -305,6 +305,8 @@ export type Database = {
           temporada: number
           titulo: string
           video_url: string
+          vistas_completas: number
+          vistas_mitad: number
         }
         Insert: {
           activo?: boolean
@@ -318,6 +320,8 @@ export type Database = {
           temporada?: number
           titulo: string
           video_url: string
+          vistas_completas?: number
+          vistas_mitad?: number
         }
         Update: {
           activo?: boolean
@@ -331,6 +335,8 @@ export type Database = {
           temporada?: number
           titulo?: string
           video_url?: string
+          vistas_completas?: number
+          vistas_mitad?: number
         }
         Relationships: []
       }
