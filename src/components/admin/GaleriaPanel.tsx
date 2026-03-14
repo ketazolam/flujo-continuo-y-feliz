@@ -448,7 +448,9 @@ const AlbumVideosView = ({ album, onBack }: { album: any; onBack: () => void }) 
       if (videoFile) {
         setUploading(true);
         const uploaded = await uploadImage(videoFile, "galeria");
-        imagenUrl = uploaded; // stored as imagen_url for direct .mp4
+        imagenUrl = uploaded;
+        // Also set as video_url for consistency
+        if (!finalVideoUrl) finalVideoUrl = uploaded;
         setUploading(false);
       }
 

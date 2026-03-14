@@ -134,7 +134,7 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
           {/* If direct video and no thumb, show video frame */}
           {!thumbFile && !currentThumb && videoUrl && isDirectVideo(videoUrl) && (
             <div className="w-24 h-14 rounded-lg overflow-hidden bg-secondary flex-shrink-0 border border-border">
-              <video src={videoUrl} muted preload="metadata" className="w-full h-full object-cover" />
+              <VideoThumbnail src={videoUrl} alt="Preview" className="w-full h-full object-cover" />
             </div>
           )}
           <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground hover:text-foreground border border-dashed border-border rounded-lg px-3 py-2 hover:border-primary/50 transition-colors flex-1">
