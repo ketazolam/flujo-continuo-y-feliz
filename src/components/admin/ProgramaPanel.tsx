@@ -25,8 +25,24 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
   const [episodio, setEpisodio] = useState(episode?.episodio ?? 1);
   const [duracion, setDuracion] = useState(episode?.duracion ?? "");
   const [thumbFile, setThumbFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [activo, setActivo] = useState(episode?.activo ?? true);
   const [saving, setSaving] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+
+  const handleVideoFileChange = async (file: File) => {
+    setVideoFile(file);
+    setUploadingVideo(true);
+    try {
+      const url = await uploadImage(file, "programa-videos");
+      setVideoUrl(url);
+      toast({ title: "Video subido ✓" });
+    } catch (err: any) {
+      toast({ title: `Error al subir video: ${err?.message}`, variant: "destructive" });
+    } finally {
+      setUploadingVideo(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
