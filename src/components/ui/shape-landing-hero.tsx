@@ -115,7 +115,7 @@ function HeroGeometric({
               variants={fadeUpVariants}
               initial="hidden"
               animate="visible"
-              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mt-8"
+              className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mt-4 sm:mt-8 px-2 sm:px-0"
             >
               {description}
             </motion.p>
