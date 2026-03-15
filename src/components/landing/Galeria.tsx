@@ -20,7 +20,6 @@ const formatDate = (d: string | null) => {
   }
 };
 
-import SafeImage from "@/components/SafeImage";
 
 // ─── Lightbox (fotos) ──────────────────────────────────────────────────────────
 
