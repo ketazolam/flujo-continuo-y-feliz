@@ -39,7 +39,7 @@ function HeroGeometric({
   };
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-16">
+    <section ref={sectionRef} className="relative min-h-[100svh] flex items-center justify-center overflow-hidden bg-background pt-14 pb-8 sm:pt-16 sm:pb-0">
       {/* Hero background image with parallax + Ken Burns zoom */}
       <motion.div
         className="absolute inset-0 z-0"
@@ -74,7 +74,7 @@ function HeroGeometric({
             variants={fadeUpVariants}
             initial="hidden"
             animate="visible"
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 border border-border mb-8"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 border border-border mb-4 sm:mb-8"
           >
             <Circle className="h-2 w-2 fill-primary text-primary" />
             <span className="text-sm text-muted-foreground tracking-wide">
@@ -101,7 +101,7 @@ function HeroGeometric({
             initial="hidden"
             animate="visible"
           >
-            <h1 className="font-bebas text-5xl sm:text-7xl md:text-9xl lg:text-[10rem] leading-none tracking-wide">
+            <h1 className="font-bebas text-[2.75rem] leading-[0.95] sm:text-7xl md:text-9xl lg:text-[10rem] sm:leading-none tracking-wide">
               <span className="text-gradient-green">{title1}</span>
               <br />
               <span className="text-gradient-green">{title2}</span>
@@ -115,7 +115,7 @@ function HeroGeometric({
               variants={fadeUpVariants}
               initial="hidden"
               animate="visible"
-              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mt-8"
+              className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mt-4 sm:mt-8 px-2 sm:px-0"
             >
               {description}
             </motion.p>
@@ -128,7 +128,7 @@ function HeroGeometric({
               variants={fadeUpVariants}
               initial="hidden"
               animate="visible"
-              className="mt-8"
+              className="mt-4 sm:mt-8"
             >
               <motion.a
                 href={ctaHref}
