@@ -1,7 +1,7 @@
 /** Extract YouTube video ID from a URL. Returns null for non-YouTube URLs or nullish input. */
 export const getYoutubeId = (url?: string | null): string | null => {
   if (!url) return null;
-  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/))([a-zA-Z0-9_-]{11})/);
   return m ? m[1] : null;
 };
 
@@ -22,10 +22,15 @@ export const resolveVideoSource = (item: { video_url?: string | null; imagen_url
   return item.video_url || item.imagen_url || null;
 };
 
-/** Check if a URL points to a direct video file (not YouTube). */
+/** Check if a URL points to a direct video file by extension. */
 export const isDirectVideoFile = (url?: string | null): boolean => {
   if (!url) return false;
-  // If it's a YouTube URL, it's not a direct file
   if (getYoutubeId(url)) return false;
-  return true;
+  return /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url);
+};
+
+/** Check if URL is a video (YouTube or direct file). */
+export const isVideoUrl = (url?: string | null): boolean => {
+  if (!url) return false;
+  return !!getYoutubeId(url) || isDirectVideoFile(url);
 };

@@ -19,18 +19,7 @@ const formatDate = (d: string | null) => {
   }
 };
 
-const SafeImage = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
-  const [error, setError] = useState(false);
-  if (error)
-    return (
-      <div className="w-full h-full bg-secondary flex items-center justify-center">
-        <Image size={24} className="text-muted-foreground" />
-      </div>
-    );
-  return (
-    <img src={src} alt={alt} className={className} loading="lazy" decoding="async" onError={() => setError(true)} />
-  );
-};
+import SafeImage from "@/components/SafeImage";
 
 // ─── Lightbox (fotos) ──────────────────────────────────────────────────────────
 
