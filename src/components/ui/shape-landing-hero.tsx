@@ -74,7 +74,7 @@ function HeroGeometric({
             variants={fadeUpVariants}
             initial="hidden"
             animate="visible"
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 border border-border mb-8"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 border border-border mb-4 sm:mb-8"
           >
             <Circle className="h-2 w-2 fill-primary text-primary" />
             <span className="text-sm text-muted-foreground tracking-wide">
