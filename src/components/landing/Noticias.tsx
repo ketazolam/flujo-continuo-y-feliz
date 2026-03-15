@@ -3,20 +3,11 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Newspaper, X, AlertCircle, Image } from "lucide-react";
+import { Loader2, Newspaper, X, AlertCircle } from "lucide-react";
+import SafeImage from "@/components/SafeImage";
 import AdBanner from "@/components/landing/AdBanner";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
-
-const SafeImage = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
-  const [error, setError] = useState(false);
-  if (error) return (
-    <div className={`bg-secondary flex items-center justify-center ${className}`}>
-      <Image size={32} className="text-muted-foreground" />
-    </div>
-  );
-  return <img src={src} alt={alt} className={className} loading="lazy" decoding="async" onError={() => setError(true)} />;
-};
 
 const NoticiaModal = ({ noticia, onClose }: { noticia: any; onClose: () => void }) => {
   useEffect(() => {
@@ -118,7 +109,7 @@ const Noticias = () => {
   const closeModal = useCallback(() => setSelectedNoticia(null), []);
 
   return (
-    <section id="noticias" className="py-16 md:py-28 px-4">
+    <section id="noticias" className="py-12 md:py-24 px-4">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -199,7 +190,7 @@ const Noticias = () => {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.15 + i * 0.1 }}
+                    transition={{ duration: 0.5, delay: Math.min(0.15 + i * 0.1, 0.5) }}
                     whileHover={{ y: -4, scale: 1.02 }}
                     className="bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all cursor-pointer group"
                     onClick={() => setSelectedNoticia(n)}
@@ -207,7 +198,7 @@ const Noticias = () => {
                     {n.imagen_url && (
                       <SafeImage src={n.imagen_url} alt={n.titulo} className="w-full h-36 object-cover" />
                     )}
-                    <div className="p-4 md:p-6">
+                    <div className="p-4 md:p-5">
                       <span className="inline-block text-[10px] font-semibold text-primary-foreground bg-primary/80 px-2.5 py-0.5 rounded-full tracking-wider mb-3">{n.tag}</span>
                       <h3 className="font-space font-semibold text-base mb-2 text-foreground group-hover:text-primary transition-colors leading-snug">{n.titulo}</h3>
                       {n.descripcion && <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{n.descripcion}</p>}

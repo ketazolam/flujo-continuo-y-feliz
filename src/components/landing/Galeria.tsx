@@ -4,9 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Image, Loader2, ChevronLeft, ChevronRight, X, AlertCircle,
-  Camera, CalendarDays, Images, Play, Video,
+  Loader2, ChevronLeft, ChevronRight, X, AlertCircle,
+  Camera, CalendarDays, Images, Play, Video, Image,
 } from "lucide-react";
+import SafeImage from "@/components/SafeImage";
 import VideoThumbnail from "@/components/VideoThumbnail";
 import { getYoutubeId, getYoutubeThumbnail, getYoutubeEmbedUrl, resolveVideoSource, isDirectVideoFile } from "@/lib/video-utils";
 
@@ -19,18 +20,6 @@ const formatDate = (d: string | null) => {
   }
 };
 
-const SafeImage = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
-  const [error, setError] = useState(false);
-  if (error)
-    return (
-      <div className="w-full h-full bg-secondary flex items-center justify-center">
-        <Image size={24} className="text-muted-foreground" />
-      </div>
-    );
-  return (
-    <img src={src} alt={alt} className={className} loading="lazy" decoding="async" onError={() => setError(true)} />
-  );
-};
 
 // ─── Lightbox (fotos) ──────────────────────────────────────────────────────────
 

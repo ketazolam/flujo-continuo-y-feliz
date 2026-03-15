@@ -3,36 +3,34 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Mic, X, Play, AlertCircle, Image, ExternalLink } from "lucide-react";
+import { Loader2, Mic, X, Play, AlertCircle, ExternalLink } from "lucide-react";
+import SafeImage from "@/components/SafeImage";
 import AdBanner from "@/components/landing/AdBanner";
-
-const isVideoFile = (url: string) => /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url);
-
-const getYouTubeId = (url: string) => {
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([^?&\s]+)/);
-  return match?.[1] || null;
-};
+import { getYoutubeId, isDirectVideoFile } from "@/lib/video-utils";
 
 const formatDate = (d: string | null) => {
   if (!d) return null;
-  try { return new Date(d).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" }); } catch { return null; }
+  try {
+    return new Date(d).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" });
+  } catch {
+    return null;
+  }
 };
 
-const SafeImage = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
+const SafeVideo = ({ src, className, controls, autoPlay }: { src: string; className?: string; controls?: boolean; autoPlay?: boolean }) => {
   const [error, setError] = useState(false);
-  if (error) return <div className={`bg-secondary flex items-center justify-center ${className}`}><Image size={32} className="text-muted-foreground" /></div>;
-  return <img src={src} alt={alt} className={className} loading="lazy" decoding="async" onError={() => setError(true)} />;
-};
-
-const SafeVideo = ({ src, className, controls, autoPlay, muted, preload }: { src: string; className?: string; controls?: boolean; autoPlay?: boolean; muted?: boolean; preload?: string }) => {
-  const [error, setError] = useState(false);
-  if (error) return <div className={`bg-secondary flex items-center justify-center ${className}`}><Image size={32} className="text-muted-foreground" /></div>;
-  return <video src={src} className={className} controls={controls} autoPlay={autoPlay} muted={muted} preload={preload} playsInline onError={() => setError(true)} />;
+  if (error)
+    return (
+      <div className={`bg-secondary flex items-center justify-center ${className}`}>
+        <Play size={32} className="text-muted-foreground" />
+      </div>
+    );
+  return <video src={src} className={className} controls={controls} autoPlay={autoPlay} muted playsInline onError={() => setError(true)} />;
 };
 
 const ReportajeLightbox = ({ item, onClose }: { item: any; onClose: () => void }) => {
-  const youtubeId = item.video_url ? getYouTubeId(item.video_url) : null;
-  const isDirectVideo = item.imagen_url && isVideoFile(item.imagen_url);
+  const youtubeId = getYoutubeId(item.video_url);
+  const isDirectVideo = item.imagen_url && isDirectVideoFile(item.imagen_url);
   const dateStr = formatDate(item.fecha_publicacion);
 
   useEffect(() => {
@@ -64,7 +62,6 @@ const ReportajeLightbox = ({ item, onClose }: { item: any; onClose: () => void }
           className="max-w-3xl w-full bg-card rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Media */}
           {youtubeId ? (
             <div className="w-full aspect-video">
               <iframe
@@ -82,7 +79,6 @@ const ReportajeLightbox = ({ item, onClose }: { item: any; onClose: () => void }
           ) : null}
 
           <div className="p-6 md:p-8">
-            {/* Ad — solo una vez, debajo del video */}
             <AdBanner posicion="video-bajo-reproductor" className="mt-0 mb-6" />
 
             <div className="flex items-center gap-2 mb-3">
@@ -121,7 +117,7 @@ const Reportajes = () => {
   const closeLightbox = useCallback(() => setSelected(null), []);
 
   return (
-    <section id="reportajes" className="py-16 md:py-28 px-4">
+    <section id="reportajes" className="py-12 md:py-24 px-4">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -150,13 +146,13 @@ const Reportajes = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {reportajes.map((r, i) => {
-              const isDirectVideo = r.imagen_url && isVideoFile(r.imagen_url);
-              const youtubeId = r.video_url ? getYouTubeId(r.video_url) : null;
-              const thumbnail = !isDirectVideo
+              const isDirect = r.imagen_url && isDirectVideoFile(r.imagen_url);
+              const youtubeId = getYoutubeId(r.video_url);
+              const thumbnail = !isDirect
                 ? (r.imagen_url || (youtubeId ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg` : null))
                 : null;
-              const dateStr = formatDate((r as any).fecha_publicacion);
-              const hasVideo = isDirectVideo || !!youtubeId;
+              const dateStr = formatDate(r.fecha_publicacion);
+              const hasVideo = isDirect || !!youtubeId;
 
               return (
                 <motion.article
@@ -164,13 +160,12 @@ const Reportajes = () => {
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  transition={{ duration: 0.5, delay: Math.min(i * 0.1, 0.3) }}
                   className="bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all cursor-pointer group"
                   onClick={() => setSelected(r)}
                 >
-                  {/* Thumbnail with overlay */}
                   <div className="relative h-48 overflow-hidden">
-                    {isDirectVideo ? (
+                    {isDirect ? (
                       <video
                         src={r.imagen_url!}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -191,10 +186,8 @@ const Reportajes = () => {
                       </div>
                     )}
 
-                    {/* Gradient overlay always present */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-                    {/* Play button for videos */}
                     {hasVideo && (
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
@@ -203,7 +196,6 @@ const Reportajes = () => {
                       </div>
                     )}
 
-                    {/* "Ver nota" CTA — visible on hover or always on mobile */}
                     <div className="absolute bottom-3 right-3">
                       <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                         {hasVideo ? "Ver video" : "Ver nota"} <ExternalLink size={10} />
@@ -211,7 +203,6 @@ const Reportajes = () => {
                     </div>
                   </div>
 
-                  {/* Content */}
                   <div className="p-4 md:p-5">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="inline-block text-[10px] font-semibold text-primary-foreground bg-primary/80 px-2.5 py-0.5 rounded-full tracking-wider">{r.tag}</span>
