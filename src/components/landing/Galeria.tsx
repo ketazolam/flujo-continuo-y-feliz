@@ -4,9 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Image, Loader2, ChevronLeft, ChevronRight, X, AlertCircle,
-  Camera, CalendarDays, Images, Play, Video,
+  Loader2, ChevronLeft, ChevronRight, X, AlertCircle,
+  Camera, CalendarDays, Images, Play, Video, Image,
 } from "lucide-react";
+import SafeImage from "@/components/SafeImage";
 import VideoThumbnail from "@/components/VideoThumbnail";
 import { getYoutubeId, getYoutubeThumbnail, getYoutubeEmbedUrl, resolveVideoSource, isDirectVideoFile } from "@/lib/video-utils";
 
