@@ -185,7 +185,7 @@ const FeaturedPlayer = ({ episode }: { episode: any }) => {
             </div>
           ) : (
             <p className="text-primary-foreground text-sm font-medium px-4 text-center">
-              Este episodio todavía no tiene un video cargado.
+              Este programa todavía no tiene un video cargado.
             </p>
           )}
         </div>

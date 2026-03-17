@@ -79,7 +79,7 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
     if (uploadingVideo) {
       toast({
         title: "Esperá a que termine la subida",
-        description: "Cuando llegue al 100% podrás guardar el episodio.",
+        description: "Cuando llegue al 100% podrás guardar el programa.",
         variant: "destructive",
       });
       return;
