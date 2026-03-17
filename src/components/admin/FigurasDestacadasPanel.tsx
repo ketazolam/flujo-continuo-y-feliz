@@ -115,7 +115,17 @@ const FigurasDestacadasPanel = () => {
             <Input placeholder="Nombre *" value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} />
             <Input placeholder="Posición (ej: Delantero)" value={form.posicion || ""} onChange={e => setForm(f => ({ ...f, posicion: e.target.value }))} />
             <Input placeholder="Equipo" value={form.equipo || ""} onChange={e => setForm(f => ({ ...f, equipo: e.target.value }))} />
-            <Input placeholder="URL de imagen" value={form.imagen_url || ""} onChange={e => setForm(f => ({ ...f, imagen_url: e.target.value }))} />
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Imagen</label>
+              <div className="flex gap-2">
+                <Input placeholder="URL de imagen" value={form.imagen_url || ""} onChange={e => setForm(f => ({ ...f, imagen_url: e.target.value }))} className="flex-1" />
+                <input ref={imgInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                <Button type="button" variant="outline" size="sm" disabled={uploadingImg} onClick={() => imgInputRef.current?.click()}>
+                  {uploadingImg ? <Loader2 size={14} className="animate-spin" /> : <><Upload size={14} className="mr-1" />Subir</>}
+                </Button>
+              </div>
+              {form.imagen_url && <SafeImage src={form.imagen_url} alt="Preview" className="w-20 h-20 rounded-lg object-cover" />}
+            </div>
             <Textarea placeholder="Descripción (opcional)" value={form.descripcion || ""} onChange={e => setForm(f => ({ ...f, descripcion: e.target.value }))} />
             <Input type="number" placeholder="Orden" value={form.orden} onChange={e => setForm(f => ({ ...f, orden: Number(e.target.value) }))} />
             <div className="flex items-center gap-2">

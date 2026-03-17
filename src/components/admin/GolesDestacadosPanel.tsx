@@ -136,8 +136,29 @@ const GolesDestacadosPanel = () => {
           <CardHeader><CardTitle>{editing ? "Editar gol" : "Nuevo gol"}</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <Input placeholder="Título *" value={form.titulo} onChange={e => setForm(f => ({ ...f, titulo: e.target.value }))} />
-            <Input placeholder="URL del video (YouTube o directo) *" value={form.video_url} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} />
-            <Input placeholder="URL miniatura (opcional)" value={form.miniatura_url || ""} onChange={e => setForm(f => ({ ...f, miniatura_url: e.target.value }))} />
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Video *</label>
+              <div className="flex gap-2">
+                <Input placeholder="URL del video (YouTube o directo)" value={form.video_url} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} className="flex-1" />
+                <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={handleVideoUpload} />
+                <Button type="button" variant="outline" size="sm" disabled={uploadingVideo} onClick={() => videoInputRef.current?.click()}>
+                  {uploadingVideo ? <><Loader2 size={14} className="animate-spin mr-1" />{videoProgress}%</> : <><Upload size={14} className="mr-1" />Subir</>}
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Miniatura (opcional)</label>
+              <div className="flex gap-2">
+                <Input placeholder="URL miniatura" value={form.miniatura_url || ""} onChange={e => setForm(f => ({ ...f, miniatura_url: e.target.value }))} className="flex-1" />
+                <input ref={thumbInputRef} type="file" accept="image/*" className="hidden" onChange={handleThumbUpload} />
+                <Button type="button" variant="outline" size="sm" disabled={uploadingThumb} onClick={() => thumbInputRef.current?.click()}>
+                  {uploadingThumb ? <Loader2 size={14} className="animate-spin" /> : <><Upload size={14} className="mr-1" />Subir</>}
+                </Button>
+              </div>
+            </div>
+
             <Textarea placeholder="Descripción (opcional)" value={form.descripcion || ""} onChange={e => setForm(f => ({ ...f, descripcion: e.target.value }))} />
             <Input type="number" placeholder="Orden" value={form.orden} onChange={e => setForm(f => ({ ...f, orden: Number(e.target.value) }))} />
             <div className="flex items-center gap-2">
