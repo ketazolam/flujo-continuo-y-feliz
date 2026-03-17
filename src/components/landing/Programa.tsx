@@ -275,7 +275,7 @@ const Programa = () => {
           <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2">
             <div className="flex items-center gap-2">
               <span className="bg-primary/10 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
-                T{featured.temporada} · E{featured.episodio}
+                T{featured.temporada} · P{featured.episodio}
               </span>
               {featured.duracion && featured.duracion !== "00:00" && (
                 <span className="flex items-center gap-1 text-muted-foreground text-xs">
