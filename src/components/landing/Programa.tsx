@@ -265,7 +265,7 @@ const Programa = () => {
             Semillero de Campeones TV
           </h2>
           <p className="text-muted-foreground text-sm text-center max-w-lg">
-            Mirá los episodios completos de nuestro programa deportivo
+            Mirá las transmisiones completas de nuestro programa deportivo
           </p>
         </div>
 
