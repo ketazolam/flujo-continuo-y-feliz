@@ -232,7 +232,7 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
       <button type="submit" disabled={saving || uploadingVideo}
         className="bg-primary text-primary-foreground px-5 py-2 rounded-lg text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2">
         {(saving || uploadingVideo) && <Loader2 size={14} className="animate-spin" />}
-        {episode ? "Guardar cambios" : "Crear episodio"}
+        {episode ? "Guardar cambios" : "Crear programa"}
       </button>
     </form>
   );
