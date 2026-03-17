@@ -58,7 +58,7 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
 
         toast({
           title: "Video subido y vinculado ✓",
-          description: "Ya quedó asociado al episodio en la portada.",
+          description: "Ya quedó asociado al programa en la portada.",
         });
       } else {
         toast({
