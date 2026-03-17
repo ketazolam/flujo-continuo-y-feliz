@@ -282,7 +282,7 @@ const ProgramaPanel = () => {
         </h2>
         <button onClick={() => { setEditing(null); setShowForm(true); }}
           className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary/90">
-          <Plus size={16} /> Nuevo episodio
+          <Plus size={16} /> Nuevo programa
         </button>
       </div>
 
