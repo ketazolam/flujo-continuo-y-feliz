@@ -293,7 +293,7 @@ const ProgramaPanel = () => {
       {isLoading ? (
         <div className="flex justify-center py-10"><Loader2 className="animate-spin text-primary" size={24} /></div>
       ) : episodios.length === 0 ? (
-        <p className="text-muted-foreground text-center py-10">No hay episodios cargados aún.</p>
+        <p className="text-muted-foreground text-center py-10">No hay programas cargados aún.</p>
       ) : (
         <div className="space-y-3">
           {episodios.map((ep) => {
