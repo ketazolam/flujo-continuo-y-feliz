@@ -8,6 +8,8 @@ import CookieConsent from "@/components/landing/CookieConsent";
 const Programa = lazy(() => import("@/components/landing/Programa"));
 const Galeria = lazy(() => import("@/components/landing/Galeria"));
 const Estadisticas = lazy(() => import("@/components/landing/Estadisticas"));
+const GolesDestacados = lazy(() => import("@/components/landing/GolesDestacados"));
+const FigurasDestacadas = lazy(() => import("@/components/landing/FigurasDestacadas"));
 const Fechas = lazy(() => import("@/components/landing/Fechas"));
 const Noticias = lazy(() => import("@/components/landing/Noticias"));
 const Reportajes = lazy(() => import("@/components/landing/Reportajes"));
