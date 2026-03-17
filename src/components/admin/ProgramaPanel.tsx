@@ -63,7 +63,7 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
       } else {
         toast({
           title: "Video subido ✓",
-          description: "Ahora guardá el episodio para publicarlo en la portada.",
+          description: "Ahora guardá el programa para publicarlo en la portada.",
         });
       }
     } catch (err: any) {
