@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { uploadImage } from "@/lib/storage";
+import { uploadImage, uploadProgramVideo } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Pencil, Loader2, X, Tv, Play, Upload, Eye, Image } from "lucide-react";
 
@@ -16,6 +16,7 @@ const getThumb = (ep: any) => {
 const isDirectVideo = (url?: string | null) => isDirectVideoFile(url);
 
 const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () => void; onCancel: () => void }) => {
+  const queryClient = useQueryClient();
   const { toast } = useToast();
   const [titulo, setTitulo] = useState(episode?.titulo ?? "");
   const [descripcion, setDescripcion] = useState(episode?.descripcion ?? "");
@@ -28,6 +29,7 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
   const [activo, setActivo] = useState(episode?.activo ?? true);
   const [saving, setSaving] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [videoUploadProgress, setVideoUploadProgress] = useState(0);
 
   // Preview for current thumbnail
   const currentThumb = getThumb(episode ?? { video_url: videoUrl });
@@ -35,10 +37,35 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
   const handleVideoFileChange = async (file: File) => {
     setVideoFile(file);
     setUploadingVideo(true);
+    setVideoUploadProgress(0);
+
     try {
-      const url = await uploadImage(file, "programa-videos");
+      const url = await uploadProgramVideo(file, setVideoUploadProgress);
       setVideoUrl(url);
-      toast({ title: "Video subido ✓" });
+
+      if (episode?.id) {
+        const { error } = await supabase
+          .from("programa_episodios")
+          .update({ video_url: url })
+          .eq("id", episode.id);
+
+        if (error) throw error;
+
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["admin_programa"] }),
+          queryClient.invalidateQueries({ queryKey: ["programa_episodios"] }),
+        ]);
+
+        toast({
+          title: "Video subido y vinculado ✓",
+          description: "Ya quedó asociado al episodio en la portada.",
+        });
+      } else {
+        toast({
+          title: "Video subido ✓",
+          description: "Ahora guardá el episodio para publicarlo en la portada.",
+        });
+      }
     } catch (err: any) {
       toast({ title: `Error al subir video: ${err?.message}`, variant: "destructive" });
     } finally {
@@ -48,6 +75,16 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (uploadingVideo) {
+      toast({
+        title: "Esperá a que termine la subida",
+        description: "Cuando llegue al 100% podrás guardar el episodio.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSaving(true);
 
     const normalizedVideoUrl = videoUrl.trim();
@@ -115,11 +152,17 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
 
       <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground hover:text-foreground border border-dashed border-border rounded-lg px-4 py-3 hover:border-primary/50 transition-colors">
         <Upload size={16} className="text-primary" />
-        <span>{uploadingVideo ? "Subiendo video..." : videoFile ? videoFile.name : "O subí un archivo de video (.mp4, .webm, .mov)"}</span>
-        <input type="file" accept="video/*" className="hidden" disabled={uploadingVideo}
+        <span>{uploadingVideo ? `Subiendo video... ${videoUploadProgress}%` : videoFile ? videoFile.name : "O subí un archivo de video (.mp4, .webm, .mov)"}</span>
+        <input type="file" accept="video/*" className="hidden" disabled={uploadingVideo || saving}
           onChange={(e) => { const f = e.target.files?.[0]; if (f) handleVideoFileChange(f); }} />
         {uploadingVideo && <Loader2 size={14} className="animate-spin ml-auto" />}
       </label>
+
+      {uploadingVideo && (
+        <div className="w-full h-1.5 rounded-full bg-secondary overflow-hidden">
+          <div className="h-full bg-primary transition-all duration-300" style={{ width: `${videoUploadProgress}%` }} />
+        </div>
+      )}
 
       <textarea placeholder="Descripción" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} rows={2}
         className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary resize-none" />
@@ -186,9 +229,9 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
         <span className="text-muted-foreground">Activo</span>
       </label>
 
-      <button type="submit" disabled={saving}
+      <button type="submit" disabled={saving || uploadingVideo}
         className="bg-primary text-primary-foreground px-5 py-2 rounded-lg text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2">
-        {saving && <Loader2 size={14} className="animate-spin" />}
+        {(saving || uploadingVideo) && <Loader2 size={14} className="animate-spin" />}
         {episode ? "Guardar cambios" : "Crear episodio"}
       </button>
     </form>
@@ -214,13 +257,21 @@ const ProgramaPanel = () => {
     if (!confirm("¿Eliminar este episodio?")) return;
     const { error } = await supabase.from("programa_episodios").delete().eq("id", id);
     if (error) toast({ title: "Error al eliminar", variant: "destructive" });
-    else queryClient.invalidateQueries({ queryKey: ["admin_programa"] });
+    else {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["admin_programa"] }),
+        queryClient.invalidateQueries({ queryKey: ["programa_episodios"] }),
+      ]);
+    }
   };
 
-  const handleSaved = () => {
+  const handleSaved = async () => {
     setShowForm(false);
     setEditing(null);
-    queryClient.invalidateQueries({ queryKey: ["admin_programa"] });
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["admin_programa"] }),
+      queryClient.invalidateQueries({ queryKey: ["programa_episodios"] }),
+    ]);
   };
 
   return (
