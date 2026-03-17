@@ -174,7 +174,7 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
             className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:border-primary" />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Episodio</label>
+          <label className="text-xs text-muted-foreground">Programa</label>
           <input type="number" min={1} value={episodio} onChange={(e) => setEpisodio(Number(e.target.value))}
             className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:border-primary" />
         </div>
