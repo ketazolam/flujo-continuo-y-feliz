@@ -137,6 +137,42 @@ export type Database = {
         }
         Relationships: []
       }
+      figuras_destacadas: {
+        Row: {
+          activo: boolean
+          created_at: string
+          descripcion: string | null
+          equipo: string | null
+          id: string
+          imagen_url: string | null
+          nombre: string
+          orden: number
+          posicion: string | null
+        }
+        Insert: {
+          activo?: boolean
+          created_at?: string
+          descripcion?: string | null
+          equipo?: string | null
+          id?: string
+          imagen_url?: string | null
+          nombre: string
+          orden?: number
+          posicion?: string | null
+        }
+        Update: {
+          activo?: boolean
+          created_at?: string
+          descripcion?: string | null
+          equipo?: string | null
+          id?: string
+          imagen_url?: string | null
+          nombre?: string
+          orden?: number
+          posicion?: string | null
+        }
+        Relationships: []
+      }
       galeria: {
         Row: {
           album_id: string | null
@@ -177,6 +213,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      goles_destacados: {
+        Row: {
+          activo: boolean
+          created_at: string
+          descripcion: string | null
+          id: string
+          miniatura_url: string | null
+          orden: number
+          titulo: string
+          video_url: string
+        }
+        Insert: {
+          activo?: boolean
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          miniatura_url?: string | null
+          orden?: number
+          titulo: string
+          video_url: string
+        }
+        Update: {
+          activo?: boolean
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          miniatura_url?: string | null
+          orden?: number
+          titulo?: string
+          video_url?: string
+        }
+        Relationships: []
       }
       hero_config: {
         Row: {
