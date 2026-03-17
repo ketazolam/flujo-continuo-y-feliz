@@ -97,14 +97,14 @@ const FigurasDestacadas = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
+            className="fixed inset-0 z-50 bg-black/85 p-3 md:p-4 overflow-y-auto"
             onClick={() => setSelected(null)}
           >
             <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              className="relative max-w-3xl w-full"
+              initial={{ scale: 0.95, y: 12 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 12 }}
+              className="relative mx-auto my-4 md:my-8 max-w-4xl w-full"
               onClick={e => e.stopPropagation()}
             >
               <button
@@ -113,12 +113,25 @@ const FigurasDestacadas = () => {
               >
                 <X size={18} />
               </button>
-              <img
+
+              <SafeImage
                 src={selectedFig.imagen_url}
                 alt={selectedFig.nombre}
-                className="w-full max-h-[85vh] object-contain rounded-xl"
+                className="w-full max-h-[72vh] md:max-h-[80vh] object-contain rounded-xl"
+                loading="eager"
               />
-              <p className="text-center text-white font-space font-semibold mt-3 text-lg">{selectedFig.nombre}</p>
+
+              <div className="mt-3 text-center text-white px-1">
+                <p className="font-space font-semibold text-lg">{selectedFig.nombre}</p>
+                {(selectedFig.posicion || selectedFig.equipo) && (
+                  <p className="text-sm text-white/80 mt-1">
+                    {[selectedFig.posicion, selectedFig.equipo].filter(Boolean).join(" · ")}
+                  </p>
+                )}
+                {selectedFig.descripcion && (
+                  <p className="text-sm text-white/85 mt-2">{selectedFig.descripcion}</p>
+                )}
+              </div>
             </motion.div>
           </motion.div>
         )}
