@@ -172,6 +172,9 @@ const Reportajes = () => {
                         preload="metadata"
                         muted
                         playsInline
+                        controlsList="nodownload"
+                        disablePictureInPicture
+                        onContextMenu={(e) => e.preventDefault()}
                         onLoadedMetadata={(e) => { (e.target as HTMLVideoElement).currentTime = 0.1; }}
                       />
                     ) : thumbnail ? (
