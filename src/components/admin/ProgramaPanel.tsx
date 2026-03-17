@@ -125,7 +125,7 @@ const EpisodeForm = ({ episode, onSave, onCancel }: { episode?: any; onSave: () 
       if (episode) {
         const { error } = await supabase.from("programa_episodios").update(payload).eq("id", episode.id);
         if (error) throw error;
-        toast({ title: "Episodio actualizado" });
+        toast({ title: "Programa actualizado" });
       } else {
         const { error } = await supabase.from("programa_episodios").insert(payload);
         if (error) throw error;
