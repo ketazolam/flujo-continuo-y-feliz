@@ -29,6 +29,24 @@ const FigurasDestacadasPanel = () => {
   const [editing, setEditing] = useState<Figura | null>(null);
   const [form, setForm] = useState(empty);
   const [creating, setCreating] = useState(false);
+  const [uploadingImg, setUploadingImg] = useState(false);
+  const imgInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImg(true);
+    try {
+      const url = await uploadImage(file, "figuras-destacadas");
+      setForm(f => ({ ...f, imagen_url: url }));
+      toast.success("Imagen subida");
+    } catch (err: any) {
+      toast.error(err.message || "Error al subir imagen");
+    } finally {
+      setUploadingImg(false);
+      if (imgInputRef.current) imgInputRef.current.value = "";
+    }
+  };
 
   const { data: figuras = [], isLoading } = useQuery({
     queryKey: ["admin_figuras_destacadas"],
