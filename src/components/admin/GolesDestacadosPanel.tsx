@@ -27,6 +27,44 @@ const GolesDestacadosPanel = () => {
   const [editing, setEditing] = useState<Gol | null>(null);
   const [form, setForm] = useState(empty);
   const [creating, setCreating] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [uploadingThumb, setUploadingThumb] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const thumbInputRef = useRef<HTMLInputElement>(null);
+
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingVideo(true);
+    setVideoProgress(0);
+    try {
+      const url = await uploadProgramVideo(file, (p) => setVideoProgress(p));
+      setForm(f => ({ ...f, video_url: url }));
+      toast.success("Video subido");
+    } catch (err: any) {
+      toast.error(err.message || "Error al subir video");
+    } finally {
+      setUploadingVideo(false);
+      if (videoInputRef.current) videoInputRef.current.value = "";
+    }
+  };
+
+  const handleThumbUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingThumb(true);
+    try {
+      const url = await uploadImage(file, "goles-miniaturas");
+      setForm(f => ({ ...f, miniatura_url: url }));
+      toast.success("Miniatura subida");
+    } catch (err: any) {
+      toast.error(err.message || "Error al subir miniatura");
+    } finally {
+      setUploadingThumb(false);
+      if (thumbInputRef.current) thumbInputRef.current.value = "";
+    }
+  };
 
   const { data: goles = [], isLoading } = useQuery({
     queryKey: ["admin_goles_destacados"],
