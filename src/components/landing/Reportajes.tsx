@@ -25,7 +25,7 @@ const SafeVideo = ({ src, className, controls, autoPlay }: { src: string; classN
         <Play size={32} className="text-muted-foreground" />
       </div>
     );
-  return <video src={src} className={className} controls={controls} autoPlay={autoPlay} muted playsInline onError={() => setError(true)} />;
+  return <video src={src} className={className} controls={controls} autoPlay={autoPlay} muted playsInline controlsList="nodownload" disablePictureInPicture onContextMenu={(e) => e.preventDefault()} onError={() => setError(true)} />;
 };
 
 const ReportajeLightbox = ({ item, onClose }: { item: any; onClose: () => void }) => {
@@ -172,6 +172,9 @@ const Reportajes = () => {
                         preload="metadata"
                         muted
                         playsInline
+                        controlsList="nodownload"
+                        disablePictureInPicture
+                        onContextMenu={(e) => e.preventDefault()}
                         onLoadedMetadata={(e) => { (e.target as HTMLVideoElement).currentTime = 0.1; }}
                       />
                     ) : thumbnail ? (
