@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { uploadImage } from "@/lib/storage";
+import { uploadImage, uploadProgramVideo } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Upload, Loader2, Image, Pencil, X } from "lucide-react";
+import { Plus, Trash2, Upload, Loader2, Image, Pencil, X, Video } from "lucide-react";
 
 const NoticiasPanel = () => {
   const queryClient = useQueryClient();
@@ -15,7 +15,9 @@ const NoticiasPanel = () => {
   const [descripcion, setDescripcion] = useState("");
   const [fecha, setFecha] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const { data: noticias = [], isLoading } = useQuery({
     queryKey: ["noticias"],
@@ -27,8 +29,8 @@ const NoticiasPanel = () => {
   });
 
   const resetForm = () => {
-    setTitulo(""); setTag(""); setDescripcion(""); setFecha(""); setImageFile(null);
-    setEditingId(null); setShowForm(false); setUploading(false);
+    setTitulo(""); setTag(""); setDescripcion(""); setFecha(""); setImageFile(null); setVideoFile(null);
+    setEditingId(null); setShowForm(false); setUploading(false); setUploadProgress(0);
   };
 
   const startEdit = (n: any) => {
@@ -38,6 +40,7 @@ const NoticiasPanel = () => {
     setDescripcion(n.descripcion || "");
     setFecha(n.fecha ? new Date(n.fecha).toISOString().slice(0, 10) : "");
     setImageFile(null);
+    setVideoFile(null);
     setShowForm(true);
   };
 
@@ -45,10 +48,14 @@ const NoticiasPanel = () => {
     mutationFn: async () => {
       setUploading(true);
       let imagen_url: string | null = null;
+      let video_url: string | null = null;
+
       if (imageFile) imagen_url = await uploadImage(imageFile, "noticias");
+      if (videoFile) video_url = await uploadProgramVideo(videoFile, (p) => setUploadProgress(p));
 
       const payload: any = { titulo, tag, descripcion };
       if (imagen_url) payload.imagen_url = imagen_url;
+      if (video_url) payload.video_url = video_url;
       if (fecha) payload.fecha = new Date(fecha).toISOString();
 
       if (editingId) {
@@ -97,11 +104,27 @@ const NoticiasPanel = () => {
             <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground focus:outline-none focus:border-primary" />
           </div>
           <textarea placeholder="Descripción" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} rows={3} className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary resize-none" />
+
+          {/* Image upload */}
           <label className="flex items-center gap-2 px-4 py-3 bg-secondary border border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
             <Upload size={16} className="text-muted-foreground" />
             <span className="text-sm text-muted-foreground">{imageFile ? imageFile.name : editingId ? "Reemplazar imagen (opcional)" : "Subir imagen destacada"}</span>
             <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} className="hidden" />
           </label>
+
+          {/* Video upload */}
+          <label className="flex items-center gap-2 px-4 py-3 bg-secondary border border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
+            <Video size={16} className="text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">{videoFile ? videoFile.name : editingId ? "Reemplazar video (opcional)" : "Subir video (opcional)"}</span>
+            <input type="file" accept="video/*" onChange={(e) => setVideoFile(e.target.files?.[0] || null)} className="hidden" />
+          </label>
+
+          {uploading && videoFile && uploadProgress > 0 && uploadProgress < 100 && (
+            <div className="w-full bg-secondary rounded-full h-2">
+              <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${uploadProgress}%` }} />
+            </div>
+          )}
+
           <button type="submit" disabled={uploading} className="px-6 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:bg-primary/90 flex items-center gap-2 disabled:opacity-50">
             {uploading && <Loader2 size={14} className="animate-spin" />}
             {editingId ? "Actualizar" : "Guardar"}
@@ -127,6 +150,7 @@ const NoticiasPanel = () => {
                   <h3 className="text-foreground font-medium truncate">{n.titulo}</h3>
                   <div className="flex gap-2 text-xs text-muted-foreground mt-1">
                     <span className="bg-primary/20 text-primary px-2 py-0.5 rounded">{n.tag}</span>
+                    {n.video_url && <span className="bg-accent/20 text-accent px-2 py-0.5 rounded flex items-center gap-1"><Video size={10} /> Video</span>}
                     <span>{new Date(n.fecha).toLocaleDateString()}</span>
                   </div>
                 </div>

@@ -44,12 +44,16 @@ const NoticiaModal = ({ noticia, onClose }: { noticia: any; onClose: () => void 
             <X size={20} />
           </button>
 
-          {noticia.imagen_url && (
+          {noticia.video_url ? (
+            <div className="relative w-full aspect-[16/9]">
+              <video src={noticia.video_url} controls className="w-full h-full object-cover bg-black" />
+            </div>
+          ) : noticia.imagen_url ? (
             <div className="relative w-full aspect-[16/9]">
               <SafeImage src={noticia.imagen_url} alt={noticia.titulo} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card/80 pointer-events-none" />
             </div>
-          )}
+          ) : null}
 
           <div className="p-6 md:p-8">
             <div className="flex flex-wrap items-center gap-2 mb-4">
