@@ -45,8 +45,17 @@ const NoticiaModal = ({ noticia, onClose }: { noticia: any; onClose: () => void 
           </button>
 
           {noticia.video_url ? (
-            <div className="relative w-full aspect-[16/9]">
-              <video src={noticia.video_url} controls className="w-full h-full object-cover bg-black" />
+            <div className="relative w-full aspect-[16/9] bg-black">
+              <video
+                src={noticia.video_url}
+                controls
+                controlsList="nodownload"
+                disablePictureInPicture
+                onContextMenu={(e) => e.preventDefault()}
+                playsInline
+                preload="metadata"
+                className="w-full h-full object-contain bg-black"
+              />
             </div>
           ) : noticia.imagen_url ? (
             <div className="relative w-full aspect-[16/9]">
