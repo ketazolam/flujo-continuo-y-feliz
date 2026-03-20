@@ -164,9 +164,20 @@ const Noticias = () => {
               className="relative rounded-2xl mb-8 hover:shadow-lg hover:shadow-primary/10 transition-all cursor-pointer group overflow-hidden"
               onClick={() => setSelectedNoticia(noticias[0])}
             >
-              {noticias[0].imagen_url ? (
+              {(noticias[0].video_url || noticias[0].imagen_url) ? (
                 <div className="relative aspect-[16/9]">
-                  <SafeImage src={noticias[0].imagen_url} alt={noticias[0].titulo} className="w-full h-full object-cover rounded-2xl" />
+                  {noticias[0].video_url ? (
+                    <video
+                      src={noticias[0].video_url}
+                      muted
+                      playsInline
+                      preload="metadata"
+                      className="w-full h-full object-cover rounded-2xl"
+                      onContextMenu={(e) => e.preventDefault()}
+                    />
+                  ) : (
+                    <SafeImage src={noticias[0].imagen_url!} alt={noticias[0].titulo} className="w-full h-full object-cover rounded-2xl" />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent rounded-2xl" />
                   <div className="absolute bottom-0 left-0 right-0 p-5 md:p-10">
                     <div className="flex items-center gap-3 mb-3 md:mb-4">
