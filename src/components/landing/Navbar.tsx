@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, CalendarDays } from "lucide-react";
 import logo from "@/assets/logo-ball.png";
 
 const navLinks = [
@@ -28,8 +28,38 @@ const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) =
   }
 };
 
+const formatToday = () =>
+  new Date().toLocaleDateString("es-AR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+const useLiveDate = () => {
+  const [date, setDate] = useState<string>(formatToday);
+  useEffect(() => {
+    let timeoutId: number;
+    const scheduleNext = () => {
+      const now = new Date();
+      const next = new Date(now);
+      next.setHours(24, 0, 1, 0); // 1s after next midnight
+      timeoutId = window.setTimeout(() => {
+        setDate(formatToday());
+        scheduleNext();
+      }, next.getTime() - now.getTime());
+    };
+    scheduleNext();
+    const onVisible = () => { if (document.visibilityState === "visible") setDate(formatToday()); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => { window.clearTimeout(timeoutId); document.removeEventListener("visibilitychange", onVisible); };
+  }, []);
+  return date;
+};
+
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const today = useLiveDate();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
@@ -42,6 +72,11 @@ const Navbar = () => {
             SEMILLERO<br className="sm:hidden" />{" "}DE CAMPEONES
           </span>
         </a>
+
+        <div className="hidden lg:flex items-center gap-1.5 text-[11px] text-muted-foreground capitalize whitespace-nowrap mr-2">
+          <CalendarDays size={12} className="text-primary" />
+          <time dateTime={new Date().toISOString().slice(0, 10)}>{today}</time>
+        </div>
 
         <div className="hidden md:flex items-center gap-3 lg:gap-5">
           {navLinks.map((l) => (
@@ -60,6 +95,10 @@ const Navbar = () => {
         <>
           <div className="fixed inset-0 top-16 z-40 md:hidden" onClick={() => setOpen(false)} />
           <div className="md:hidden relative z-50 bg-background border-b border-border px-4 pb-4 space-y-1">
+            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground capitalize pt-2 pb-1 border-b border-border/50 mb-1">
+              <CalendarDays size={12} className="text-primary" />
+              <time dateTime={new Date().toISOString().slice(0, 10)}>{today}</time>
+            </div>
             {navLinks.map((l) => (
               <a key={l.href} href={l.href} onClick={(e) => { scrollToSection(e, l.href); setOpen(false); }} className="block py-2.5 px-2 text-muted-foreground hover:text-primary transition-colors text-sm">
                 {l.label}
