@@ -410,7 +410,11 @@ const Galeria = () => {
     queryKey: ["albumes"],
     queryFn: async () => {
       const [{ data: albumData, error }, { data: countData }, { data: videoData }] = await Promise.all([
-        supabase.from("albumes").select("*").order("fecha_publicacion", { ascending: false }),
+        supabase
+          .from("albumes")
+          .select("*")
+          .order("fecha_publicacion", { ascending: false, nullsFirst: false })
+          .order("created_at", { ascending: false }),
         supabase.from("galeria").select("album_id").not("album_id", "is", null),
         // Fetch both video_url and imagen_url to resolve direct videos too
         supabase.from("galeria").select("album_id, video_url, imagen_url, tipo").eq("tipo", "Video"),
