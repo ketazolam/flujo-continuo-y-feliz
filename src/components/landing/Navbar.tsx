@@ -73,8 +73,8 @@ const Navbar = () => {
           </span>
         </a>
 
-        <div className="hidden lg:flex items-center gap-1.5 text-[11px] text-muted-foreground capitalize whitespace-nowrap mr-2">
-          <CalendarDays size={12} className="text-primary" />
+        <div className="hidden lg:flex items-center gap-1.5 text-xs font-semibold text-foreground capitalize whitespace-nowrap mr-2 px-3 py-1.5 rounded-full bg-primary/15 border border-primary/30">
+          <CalendarDays size={14} className="text-primary" />
           <time dateTime={new Date().toISOString().slice(0, 10)}>{today}</time>
         </div>
 
@@ -86,9 +86,17 @@ const Navbar = () => {
           ))}
         </div>
 
-        <button className="md:hidden text-foreground" onClick={() => setOpen(!open)}>
-          {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-1 text-[11px] font-semibold text-foreground capitalize px-2 py-1 rounded-full bg-primary/15 border border-primary/30">
+            <CalendarDays size={11} className="text-primary" />
+            <time dateTime={new Date().toISOString().slice(0, 10)}>
+              {new Date().toLocaleDateString("es-AR", { day: "numeric", month: "short" })}
+            </time>
+          </div>
+          <button className="text-foreground" onClick={() => setOpen(!open)}>
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {open && (
