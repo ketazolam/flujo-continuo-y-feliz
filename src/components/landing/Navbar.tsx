@@ -73,20 +73,20 @@ const Navbar = () => {
           </span>
         </a>
 
-        <div className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-foreground capitalize whitespace-nowrap mr-2 px-3 py-1.5 rounded-full bg-primary/15 border border-primary/30">
+        <div className="hidden lg:flex items-center gap-1.5 text-xs font-semibold text-foreground capitalize whitespace-nowrap mr-3 px-3 py-1.5 rounded-full bg-primary/15 border border-primary/30">
           <CalendarDays size={14} className="text-primary" />
           <time dateTime={new Date().toISOString().slice(0, 10)}>{today}</time>
         </div>
 
-        <div className="hidden md:flex items-center gap-3 lg:gap-5">
+        <div className="hidden lg:flex items-center gap-4">
           {navLinks.map((l) => (
-            <a key={l.href} href={l.href} onClick={(e) => scrollToSection(e, l.href)} className="text-xs lg:text-sm text-muted-foreground hover:text-primary transition-colors whitespace-nowrap">
+            <a key={l.href} href={l.href} onClick={(e) => scrollToSection(e, l.href)} className="text-sm text-muted-foreground hover:text-primary transition-colors whitespace-nowrap">
               {l.label}
             </a>
           ))}
         </div>
 
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-3 lg:hidden">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground capitalize px-2.5 py-1.5 rounded-full bg-primary/15 border border-primary/30">
             <CalendarDays size={12} className="text-primary" />
             <time dateTime={new Date().toISOString().slice(0, 10)}>
@@ -101,8 +101,8 @@ const Navbar = () => {
 
       {open && (
         <>
-          <div className="fixed inset-0 top-16 z-40 md:hidden" onClick={() => setOpen(false)} />
-          <div className="md:hidden relative z-50 bg-background border-b border-border px-4 pb-4 space-y-1">
+          <div className="fixed inset-0 top-16 z-40 lg:hidden" onClick={() => setOpen(false)} />
+          <div className="lg:hidden relative z-50 bg-background border-b border-border px-4 pb-4 space-y-1">
             <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground capitalize pt-2 pb-1 border-b border-border/50 mb-1">
               <CalendarDays size={12} className="text-primary" />
               <time dateTime={new Date().toISOString().slice(0, 10)}>{today}</time>
