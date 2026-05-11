@@ -73,7 +73,7 @@ const Navbar = () => {
           </span>
         </a>
 
-        <div className="hidden lg:flex items-center gap-1.5 text-xs font-semibold text-foreground capitalize whitespace-nowrap mr-2 px-3 py-1.5 rounded-full bg-primary/15 border border-primary/30">
+        <div className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-foreground capitalize whitespace-nowrap mr-2 px-3 py-1.5 rounded-full bg-primary/15 border border-primary/30">
           <CalendarDays size={14} className="text-primary" />
           <time dateTime={new Date().toISOString().slice(0, 10)}>{today}</time>
         </div>
