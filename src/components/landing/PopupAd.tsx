@@ -35,11 +35,11 @@ const PopupAd = () => {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+      className="fixed inset-x-0 top-16 bottom-0 z-[40] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto"
       onClick={() => setDismissed(true)}
     >
       <div
-        className="relative bg-card rounded-2xl overflow-hidden w-full max-w-sm sm:max-w-lg shadow-2xl border border-border/50 animate-in fade-in zoom-in-95 duration-300"
+        className="relative bg-card rounded-2xl overflow-hidden w-full max-w-[92vw] sm:max-w-md md:max-w-lg my-auto shadow-2xl border border-border/50 animate-in fade-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -57,8 +57,9 @@ const PopupAd = () => {
           <img
             src={anuncio.imagen_url}
             alt={anuncio.titulo}
-            className="block w-full max-h-[60vh] object-contain"
+            className="block w-full max-h-[55vh] sm:max-h-[60vh] object-contain bg-card"
             loading="eager"
+            decoding="async"
           />
         )}
 
