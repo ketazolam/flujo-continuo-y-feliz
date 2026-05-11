@@ -148,11 +148,11 @@ const AlbumFotosModal = ({ album, onClose }: { album: any; onClose: () => void }
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                   {fotos.map((foto, i) => (
                     <motion.div key={foto.id} whileHover={{ scale: 1.04 }}
-                      className="aspect-square rounded-lg overflow-hidden cursor-pointer"
+                      className="aspect-square rounded-lg overflow-hidden cursor-pointer bg-black/40 flex items-center justify-center"
                       onClick={() => setLightboxIndex(i)}
                     >
                       {foto.imagen_url ? (
-                        <SafeImage src={foto.imagen_url} alt={foto.titulo || ""} width={300} className="w-full h-full object-cover" />
+                        <SafeImage src={foto.imagen_url} alt={foto.titulo || ""} width={400} className="w-full h-full object-contain" />
                       ) : (
                         <div className="w-full h-full bg-secondary flex items-center justify-center">
                           <Image size={18} className="text-muted-foreground" />
@@ -358,13 +358,13 @@ const AlbumesSectionGrid = ({
           className="rounded-xl overflow-hidden cursor-pointer border border-border hover:border-primary/50 transition-colors bg-card group"
           onClick={() => onSelect(album)}
         >
-          <div className="aspect-[4/3] relative overflow-hidden">
+          <div className="aspect-[4/3] relative overflow-hidden bg-black/40 flex items-center justify-center">
             {album.miniatura_url ? (
-              <SafeImage src={album.miniatura_url} alt={album.titulo} width={400} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+              <SafeImage src={album.miniatura_url} alt={album.titulo} width={500} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" />
             ) : album.firstVideoUrl && ytId ? (
-              <img src={`https://img.youtube.com/vi/${ytId}/mqdefault.jpg`} alt={album.titulo} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
+              <img src={`https://img.youtube.com/vi/${ytId}/mqdefault.jpg`} alt={album.titulo} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" loading="lazy" />
             ) : album.firstVideoUrl ? (
-              <VideoThumbnail src={album.firstVideoUrl} alt={album.titulo} className="w-full h-full object-cover" />
+              <VideoThumbnail src={album.firstVideoUrl} alt={album.titulo} className="w-full h-full object-contain" />
             ) : (
               <div className="w-full h-full bg-secondary flex items-center justify-center">
                 {tipo === "videos" ? <Video size={22} className="text-muted-foreground" /> : <Camera size={22} className="text-muted-foreground" />}

@@ -61,12 +61,15 @@ const FigurasDestacadas = () => {
                 className="group bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all"
               >
                 {fig.imagen_url ? (
-                  <div className="cursor-pointer" onClick={() => setSelected(fig.id)}>
+                  <div
+                    className="cursor-pointer w-full aspect-[3/4] bg-black/40 flex items-center justify-center overflow-hidden"
+                    onClick={() => setSelected(fig.id)}
+                  >
                     <SafeImage
                       src={fig.imagen_url}
                       alt={fig.nombre}
-                      width={400}
-                      className="w-full aspect-[3/4] object-cover"
+                      width={500}
+                      className="w-full h-full object-contain"
                     />
                   </div>
                 ) : (
