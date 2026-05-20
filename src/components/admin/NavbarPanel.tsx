@@ -41,7 +41,10 @@ const NavbarPanel = () => {
       queryClient.invalidateQueries({ queryKey: ["navbar_config"] });
       toast({ title: "Fecha del navbar actualizada" });
     },
-    onError: () => toast({ title: "Error al guardar", variant: "destructive" }),
+    onError: (err: any) => {
+      console.error("navbar_config update error:", err);
+      toast({ title: `Error: ${err?.message || "al guardar"}`, variant: "destructive" });
+    },
   });
 
   const todayPreview = new Date().toLocaleDateString("es-AR", {
