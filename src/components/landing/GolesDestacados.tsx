@@ -16,7 +16,7 @@ const GolesDestacados = () => {
         .from("goles_destacados")
         .select("*")
         .eq("activo", true)
-        .order("orden", { ascending: true });
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },

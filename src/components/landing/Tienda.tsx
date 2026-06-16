@@ -7,7 +7,7 @@ const Tienda = () => {
   const { data: productos = [], isLoading } = useQuery({
     queryKey: ["productos"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("productos").select("*").order("orden", { ascending: true });
+      const { data, error } = await supabase.from("productos").select("*").order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
