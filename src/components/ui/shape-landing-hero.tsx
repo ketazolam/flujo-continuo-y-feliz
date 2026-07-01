@@ -123,7 +123,7 @@ function HeroGeometric({
           )}
 
           {/* CTA */}
-          {ctaText && ctaHref && (
+          {ctaText && ctaHref && (/^https?:\/\//i.test(ctaHref) || ctaHref.startsWith("#") || ctaHref.startsWith("/")) && (
             <motion.div
               custom={3}
               variants={fadeUpVariants}
