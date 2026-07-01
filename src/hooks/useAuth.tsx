@@ -19,14 +19,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const checkAdmin = async (userId: string) => {
-    const { data } = await supabase
+  const ADMIN_EMAILS = ["eduardoibacache@yahoo.com"];
+
+  const checkAdmin = async (userId: string, email?: string) => {
+    // Check user_roles table first
+    const { data, error } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
       .eq("role", "admin")
       .maybeSingle();
-    setIsAdmin(!!data);
+    if (data) {
+      setIsAdmin(true);
+      return;
+    }
+    // Fallback: check by email
+    if (email && ADMIN_EMAILS.includes(email.toLowerCase())) {
+      setIsAdmin(true);
+      return;
+    }
+    setIsAdmin(false);
   };
 
   useEffect(() => {
@@ -37,7 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkAdmin(session.user.id);
+        checkAdmin(session.user.id, session.user.email);
       }
       setLoading(false);
     });
@@ -47,7 +59,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkAdmin(session.user.id);
+        checkAdmin(session.user.id, session.user.email);
       } else {
         setIsAdmin(false);
       }
